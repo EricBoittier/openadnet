@@ -5,6 +5,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from matplotlib import gridspec
 
 
@@ -295,3 +296,250 @@ def plot_model_comparison(
     ax.set_xlabel("descriptor")
     plt.tight_layout()
     return ax
+
+
+def set_notebook_style() -> None:
+    """Match PXR tutorial notebook defaults (``whitegrid``, ``notebook`` context)."""
+    sns.set_style("whitegrid")
+    sns.set_context("notebook")
+
+
+def plot_pec50_distribution_kde(
+    df: pd.DataFrame,
+    *,
+    col: str = "pEC50",
+    ax: plt.Axes | None = None,
+    bins: int = 40,
+    color: str = "steelblue",
+    figsize: tuple[float, float] = (8.0, 4.0),
+) -> plt.Axes:
+    """Histogram + KDE of ``col`` for rows with non-null ``col`` (tutorial-style)."""
+    pec50_df = df.dropna(subset=[col]).reset_index(drop=True)
+    if ax is None:
+        _, ax = plt.subplots(figsize=figsize)
+    if len(pec50_df) == 0:
+        ax.set_title(f"{col}: no data")
+        return ax
+    sns.histplot(pec50_df[col], bins=bins, kde=True, ax=ax, color=color)
+    ax.set_xlabel(col)
+    ax.set_ylabel("Count")
+    ax.set_title(f"pEC50 distribution (N = {len(pec50_df)}/{len(df)})")
+    return ax
+
+
+def plot_emax_pair_histograms(
+    df: pd.DataFrame,
+    *,
+    emax_col: str = "Emax_estimate (log2FC vs. baseline)",
+    emax_ctrl_col: str = "Emax.vs.pos.ctrl_estimate (dimensionless)",
+    axes: tuple[plt.Axes, plt.Axes] | None = None,
+    figsize: tuple[float, float] = (12.0, 4.0),
+    bins: int = 40,
+) -> tuple[plt.Axes, plt.Axes]:
+    """Side-by-side KDE histograms for Emax and Emax vs. positive control (tutorial-style)."""
+    if axes is None:
+        _, ax_pair = plt.subplots(1, 2, figsize=figsize)
+        ax0, ax1 = ax_pair[0], ax_pair[1]
+    else:
+        ax0, ax1 = axes
+
+    for ax, col, title, xlab in (
+        (
+            ax0,
+            emax_col,
+            f"Emax (N = {df[emax_col].notna().sum()})",
+            r"Emax (log$_2$FC vs. baseline)",
+        ),
+        (
+            ax1,
+            emax_ctrl_col,
+            f"Emax vs. pos. ctrl (N = {df[emax_ctrl_col].notna().sum()})",
+            "Emax vs. pos. ctrl (dimensionless)",
+        ),
+    ):
+        s = df[col].dropna()
+        if len(s) == 0:
+            ax.set_title(f"{col}: no data")
+            continue
+        sns.histplot(s, bins=bins, kde=True, ax=ax, color="coral" if ax is ax0 else "darkorange")
+        ax.set_xlabel(xlab)
+        ax.set_ylabel("Count")
+        ax.set_title(title)
+
+    return ax0, ax1
+
+
+def _merge_counter_assay_plot_df(
+    train_df: pd.DataFrame,
+    train_counter_df: pd.DataFrame,
+    *,
+    id_col: str = "Molecule Name",
+    primary_pec50: str = "pEC50",
+    counter_pec50: str = "pEC50",
+) -> pd.DataFrame:
+    c = train_counter_df.rename(columns={counter_pec50: "counter_pEC50"})
+    return c.merge(
+        train_df[[id_col, primary_pec50]],
+        on=id_col,
+        how="inner",
+    )
+
+
+def plot_counter_assay_triage(
+    train_df: pd.DataFrame | None = None,
+    train_counter_df: pd.DataFrame | None = None,
+    *,
+    merged: pd.DataFrame | None = None,
+    id_col: str = "Molecule Name",
+    primary_pec50: str = "pEC50",
+    counter_pec50: str = "pEC50",
+    potency_threshold: float = 6.0,
+    selectivity_margin: float = 1.5,
+    plot_floor: float = 1.0,
+    xlim: tuple[float, float] = (1.0, 8.0),
+    ylim: tuple[float, float] = (1.0, 8.0),
+    ax: plt.Axes | None = None,
+    figsize: tuple[float, float] = (7.0, 7.0),
+) -> plt.Axes:
+    """
+    Primary vs counter-assay pEC50 scatter with selectivity band (PXR tutorial).
+
+    Pass either ``merged`` (columns ``pEC50``, ``counter_pEC50``) or both
+    ``train_df`` and ``train_counter_df`` (merged on ``id_col``).
+    """
+    if merged is None:
+        if train_df is None or train_counter_df is None:
+            raise ValueError("Provide ``merged`` or both ``train_df`` and ``train_counter_df``.")
+        counter_plot_df = _merge_counter_assay_plot_df(
+            train_df,
+            train_counter_df,
+            id_col=id_col,
+            primary_pec50=primary_pec50,
+            counter_pec50=counter_pec50,
+        )
+    else:
+        counter_plot_df = merged.copy()
+
+    if "counter_pEC50" not in counter_plot_df.columns:
+        raise ValueError("Merged data must contain column 'counter_pEC50'.")
+    if primary_pec50 not in counter_plot_df.columns:
+        raise ValueError(f"Merged data must contain primary column {primary_pec50!r}.")
+
+    counter_plot_df["selectivity_delta"] = (
+        counter_plot_df[primary_pec50] - counter_plot_df["counter_pEC50"]
+    )
+    counter_plot_df["is_selective"] = (counter_plot_df[primary_pec50] >= potency_threshold) & (
+        counter_plot_df["selectivity_delta"] >= selectivity_margin
+    )
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=figsize)
+
+    x_range = np.linspace(0, 10, 100)
+    ax.fill_between(
+        x_range,
+        plot_floor,
+        x_range - selectivity_margin,
+        where=(x_range >= potency_threshold) & (x_range - selectivity_margin > plot_floor),
+        color="green",
+        alpha=0.15,
+        label="Potent and selective region",
+    )
+    sns.scatterplot(
+        data=counter_plot_df,
+        x=primary_pec50,
+        y="counter_pEC50",
+        hue="is_selective",
+        palette={False: "darkorange", True: "darkgreen"},
+        ax=ax,
+        alpha=0.65,
+        s=28,
+    )
+    ax.plot(x_range, x_range, color="black", linestyle="--", alpha=0.4, label="No selectivity")
+    ax.plot(
+        x_range,
+        x_range - selectivity_margin,
+        color="green",
+        linestyle=":",
+        linewidth=2,
+        label=f"{selectivity_margin:g} log unit selectivity margin",
+    )
+    ax.axvline(potency_threshold, color="navy", linestyle="-.", alpha=0.7, label=f"Primary pEC50 = {potency_threshold:g}")
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_xlabel("Primary-assay pEC50", fontsize=12)
+    ax.set_ylabel("Counter-assay pEC50", fontsize=12)
+    ax.set_title("Counter-assay triage: potency vs. selectivity", fontsize=14)
+    ax.legend(loc="upper left", frameon=True)
+    ax.grid(alpha=0.15)
+    return ax
+
+
+def plot_single_concentration_grid(
+    train_single_df: pd.DataFrame,
+    *,
+    concentration_col: str = "concentration_M",
+    log2fc_col: str = "log2_fc_estimate",
+    fdr_col: str = "fdr_bh",
+    hit_log2_threshold: float = 1.0,
+    hit_fdr_threshold: float = 0.05,
+    bins: int = 50,
+    figsize: tuple[float, float] = (12.0, 8.0),
+    axes: np.ndarray | None = None,
+) -> np.ndarray:
+    """
+    2×2 histograms of ``log2_fc_estimate`` by concentration (primary screen; tutorial-style).
+
+    If ``is_hit`` is absent, it is computed as
+    ``(log2fc > hit_log2_threshold) & (fdr < hit_fdr_threshold)`` when ``fdr_col`` exists,
+    else ``log2fc > hit_log2_threshold`` only.
+    """
+    required = {concentration_col, log2fc_col}
+    missing = required - set(train_single_df.columns)
+    if missing:
+        raise ValueError(f"train_single_df missing columns: {sorted(missing)}")
+
+    df = train_single_df.copy()
+    if "is_hit" not in df.columns:
+        if fdr_col in df.columns:
+            df["is_hit"] = (df[log2fc_col] > hit_log2_threshold) & (df[fdr_col] < hit_fdr_threshold)
+        else:
+            df["is_hit"] = df[log2fc_col] > hit_log2_threshold
+
+    concs = sorted(df[concentration_col].unique())[:4]
+    if len(concs) == 0:
+        raise ValueError("No concentrations in train_single_df.")
+
+    if axes is None:
+        _, axes_arr = plt.subplots(2, 2, figsize=figsize, sharex=True)
+        axes_flat = axes_arr.flatten()
+    else:
+        axes_flat = axes.flatten()
+
+    for index, conc in enumerate(concs):
+        if index >= 4:
+            break
+        df_conc = df[df[concentration_col] == conc].copy()
+        hit_rate = 100.0 * float(df_conc["is_hit"].mean()) if len(df_conc) else 0.0
+        ax_i = axes_flat[index]
+        sns.histplot(
+            df_conc[log2fc_col],
+            bins=bins,
+            kde=True,
+            ax=ax_i,
+            color="steelblue",
+            alpha=0.75,
+        )
+        ax_i.axvline(hit_log2_threshold, color="crimson", linestyle="--", label="Hit threshold")
+        ax_i.set_title(f"{conc:.2g} M (N = {len(df_conc)}, hits = {hit_rate:.1f}%)")
+        ax_i.set_xlabel(r"$\log_{2}$ fold change")
+        ax_i.set_ylabel("Count")
+        if index == 0:
+            ax_i.legend()
+
+    for j in range(len(concs), 4):
+        axes_flat[j].set_visible(False)
+
+    plt.suptitle("Primary screen: log2 fold-change by concentration", fontsize=15)
+    plt.tight_layout()
+    return axes_flat

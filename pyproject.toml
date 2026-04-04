@@ -16,6 +16,9 @@ dependencies = [
     "numpy",
     "pandas",
     "matplotlib",
+    "seaborn",
+    "scipy",
+    "pyarrow",
     "better-tables>=1.0.2",
     "tqdm",
 ]
@@ -30,4 +33,5 @@ py-modules = [
     "viz",
     "uncertainty",
     "reporting",
+    "submission",
 ]
