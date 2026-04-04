@@ -2,6 +2,14 @@
 
 PXR challenge baseline: molecular descriptors, sklearn regressors with cross-validation, optional plots (`viz`), and uncertainty helpers (`uncertainty`).
 
+### Fingerprint grid
+
+Descriptors are built for **fp sizes** `512, 1024, 2048, 4096`. **Morgan** fingerprints use radii **`0, 1, 2, 3`** (RDKit bond-radius / “hop” count), named `morgan_r{radius}_{bits|count}_{size}`. For each size, RDKit, atom pair, and topological torsion are also included — each as **binary** (`*_bits_{size}`) and **count** (`*_count_{size}`) via `GetFingerprintAsNumPy` / `GetCountFingerprintAsNumPy`, plus `rdkit_phys_props`. Per-molecule values are cached on disk under `~/.cache/openadnet/fingerprints` (override with `OPENADNET_FP_CACHE`; bump `FP_CACHE_VERSION` in `features_data.py` if definitions change).
+
+### CV result cache
+
+Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/baseline_cv_cache.json` keyed by a hash of the training SMILES + target and the CV config. Reruns **skip** pairs already in the cache. Remove the file or change `CV_RESULT_CACHE_SCHEMA` in `baseline.py` to force a full recompute.
+
 ## Latest baseline CV
 
 <!-- BASELINE_CV_TABLE_START -->

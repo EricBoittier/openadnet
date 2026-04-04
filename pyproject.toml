@@ -17,6 +17,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "better-tables>=1.0.2",
+    "tqdm",
 ]
 
 [tool.setuptools]

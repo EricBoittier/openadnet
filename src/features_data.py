@@ -9,10 +9,14 @@ from joblib import Memory
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 
-FP_SIZE = 2048
+# Bump when generator definitions or phys props change (invalidates joblib fingerprint cache).
+FP_CACHE_VERSION = "v3_morgan_radii_0123"
 
-# Bump when FP generators, FP_SIZE, or descriptor definitions change (invalidates disk cache).
-FP_CACHE_VERSION = "v1_fp2048_phys15"
+# Default fingerprint widths to evaluate (smaller → larger).
+DEFAULT_FP_SIZES: tuple[int, ...] = (512, 1024, 2048, 4096)
+
+# Morgan fingerprint radii (hop / bond-radius in RDKit Morgan implementation).
+DEFAULT_MORGAN_RADII: tuple[int, ...] = (0, 1, 2, 3)
 
 # Disk cache for per-molecule fingerprints / phys vectors. Set OPENADNET_FP_CACHE="" to disable
 # disk (in-process lru_cache only). Default: ~/.cache/openadnet/fingerprints
@@ -35,19 +39,92 @@ if _cd is not None:
 else:
     _fp_memory = None
 
-# Fixed-size generators: GetFingerprintAsNumPy(mol) -> (FP_SIZE,) uint8
-FP_GENERATORS: dict[str, object] = {
-    "morgan_bits_2048_r2": rdFingerprintGenerator.GetMorganGenerator(
-        radius=2, fpSize=FP_SIZE
-    ),
-    "rdkit_bits_2048": rdFingerprintGenerator.GetRDKitFPGenerator(fpSize=FP_SIZE),
-    "atom_pair_bits_2048": rdFingerprintGenerator.GetAtomPairGenerator(
-        fpSize=FP_SIZE
-    ),
-    "torsion_bits_2048": rdFingerprintGenerator.GetTopologicalTorsionGenerator(
-        fpSize=FP_SIZE
-    ),
+
+def _build_fp_registry(
+    fp_sizes: tuple[int, ...] = DEFAULT_FP_SIZES,
+    morgan_radii: tuple[int, ...] = DEFAULT_MORGAN_RADII,
+) -> dict[str, dict]:
+    """
+    Registry keys: Morgan ``morgan_r{radius}_{bits|count}_{fp_size}``; others
+    ``{family}_{bits|count}_{fp_size}``.
+    Each value: gen, count flag, fp_size (for zero vectors).
+    """
+    reg: dict[str, dict] = {}
+    for fp_size in fp_sizes:
+        for radius in morgan_radii:
+            gm = rdFingerprintGenerator.GetMorganGenerator(
+                radius=radius, fpSize=fp_size
+            )
+            reg[f"morgan_r{radius}_bits_{fp_size}"] = {
+                "gen": gm,
+                "count": False,
+                "fp_size": fp_size,
+            }
+            reg[f"morgan_r{radius}_count_{fp_size}"] = {
+                "gen": gm,
+                "count": True,
+                "fp_size": fp_size,
+            }
+
+        gr = rdFingerprintGenerator.GetRDKitFPGenerator(fpSize=fp_size)
+        reg[f"rdkit_bits_{fp_size}"] = {"gen": gr, "count": False, "fp_size": fp_size}
+        reg[f"rdkit_count_{fp_size}"] = {"gen": gr, "count": True, "fp_size": fp_size}
+
+        ga = rdFingerprintGenerator.GetAtomPairGenerator(fpSize=fp_size)
+        reg[f"atom_pair_bits_{fp_size}"] = {
+            "gen": ga,
+            "count": False,
+            "fp_size": fp_size,
+        }
+        reg[f"atom_pair_count_{fp_size}"] = {
+            "gen": ga,
+            "count": True,
+            "fp_size": fp_size,
+        }
+
+        gt = rdFingerprintGenerator.GetTopologicalTorsionGenerator(fpSize=fp_size)
+        reg[f"torsion_bits_{fp_size}"] = {
+            "gen": gt,
+            "count": False,
+            "fp_size": fp_size,
+        }
+        reg[f"torsion_count_{fp_size}"] = {
+            "gen": gt,
+            "count": True,
+            "fp_size": fp_size,
+        }
+
+    return reg
+
+
+FP_REGISTRY: dict[str, dict] = _build_fp_registry()
+
+# Legacy / notebook names → canonical registry keys
+_NAME_ALIASES: dict[str, str] = {
+    "morgan_bits_2048_r2": "morgan_r2_bits_2048",
+    "rdkit_bits_2048": "rdkit_bits_2048",
+    "atom_pair_bits_2048": "atom_pair_bits_2048",
+    "atom_pair_sparse": "atom_pair_bits_2048",
+    "torsion_bits_2048": "torsion_bits_2048",
+    "torsion_sparse": "torsion_bits_2048",
 }
+
+
+def resolve_descriptor_name(name: str) -> str:
+    return _NAME_ALIASES.get(name, name)
+
+
+# Backwards compatibility: fpspecs maps old keys to generators (2048 bits only)
+def _fpspecs_compat() -> dict[str, object]:
+    return {
+        "morgan_bits_2048_r2": FP_REGISTRY["morgan_r2_bits_2048"]["gen"],
+        "rdkit_bits_2048": FP_REGISTRY["rdkit_bits_2048"]["gen"],
+        "atom_pair_sparse": FP_REGISTRY["atom_pair_bits_2048"]["gen"],
+        "torsion_sparse": FP_REGISTRY["torsion_bits_2048"]["gen"],
+    }
+
+
+fpspecs = _fpspecs_compat()
 
 # Scalar physicochemical descriptors (per molecule)
 _RDKIT_PHYS_FUNCS: list[tuple[str, object]] = [
@@ -71,8 +148,10 @@ _RDKIT_PHYS_FUNCS: list[tuple[str, object]] = [
 RDKIT_PHYS_PROP_NAMES: tuple[str, ...] = tuple(n for n, _ in _RDKIT_PHYS_FUNCS)
 
 
-def _fp_zeros() -> np.ndarray:
-    return np.zeros(FP_SIZE, dtype=np.uint8)
+def _fp_zeros(fp_size: int, count: bool) -> np.ndarray:
+    if count:
+        return np.zeros(fp_size, dtype=np.float32)
+    return np.zeros(fp_size, dtype=np.uint8)
 
 
 def _mol_to_canonical_smiles(mol) -> str | None:
@@ -86,17 +165,26 @@ def _mol_to_canonical_smiles(mol) -> str | None:
 
 def _fp_row_compute(cache_version: str, fp_name: str, canon_smiles: str) -> np.ndarray:
     _ = cache_version
-    gen = FP_GENERATORS[fp_name]
+    canon = resolve_descriptor_name(fp_name)
+    if canon not in FP_REGISTRY:
+        raise KeyError(f"Unknown fingerprint descriptor: {fp_name!r}")
+    entry = FP_REGISTRY[canon]
+    gen = entry["gen"]
+    count = entry["count"]
+    fp_size = entry["fp_size"]
     m = Chem.MolFromSmiles(canon_smiles)
     if m is None:
-        return _fp_zeros()
+        return _fp_zeros(fp_size, count)
+    if count:
+        arr = np.asarray(gen.GetCountFingerprintAsNumPy(m), dtype=np.float32)
+        return arr
     return np.asarray(gen.GetFingerprintAsNumPy(m), dtype=np.uint8)
 
 
 _fp_disk = _fp_memory.cache(_fp_row_compute) if _fp_memory else _fp_row_compute
 
 
-@lru_cache(maxsize=65_536)
+@lru_cache(maxsize=131_072)
 def _fp_row(fp_name: str, canon_smiles: str) -> np.ndarray:
     return _fp_disk(FP_CACHE_VERSION, fp_name, canon_smiles)
 
@@ -136,16 +224,23 @@ def clear_fingerprint_caches() -> None:
 
 
 def build_fingerprint_matrix(name: str, mols: list) -> np.ndarray:
-    if name not in FP_GENERATORS:
+    canon = resolve_descriptor_name(name)
+    if canon not in FP_REGISTRY:
         raise KeyError(f"Unknown fingerprint descriptor: {name!r}")
+    entry = FP_REGISTRY[canon]
+    fp_size = entry["fp_size"]
+    count = entry["count"]
     rows = []
     for m in mols:
         smi = _mol_to_canonical_smiles(m)
         if smi is None:
-            rows.append(_fp_zeros())
+            rows.append(_fp_zeros(fp_size, count))
         else:
-            rows.append(_fp_row(name, smi))
-    return np.stack(rows, axis=0)
+            rows.append(_fp_row(canon, smi))
+    stacked = np.stack(rows, axis=0)
+    if count:
+        return stacked.astype(np.float64, copy=False)
+    return stacked.astype(np.float64, copy=False)
 
 
 def build_rdkit_phys_props_matrix(mols: list) -> np.ndarray:
@@ -160,8 +255,39 @@ def build_rdkit_phys_props_matrix(mols: list) -> np.ndarray:
     return out
 
 
-def list_descriptor_names() -> list[str]:
-    return list(FP_GENERATORS.keys()) + ["rdkit_phys_props"]
+def list_descriptor_names(
+    fp_sizes: tuple[int, ...] | None = None,
+    morgan_radii: tuple[int, ...] | None = None,
+    include_phys: bool = True,
+) -> list[str]:
+    """
+    All fingerprint descriptor keys for the given sizes (default: :data:`DEFAULT_FP_SIZES`)
+    and Morgan radii (default: :data:`DEFAULT_MORGAN_RADII`).
+    """
+    sizes = fp_sizes if fp_sizes is not None else DEFAULT_FP_SIZES
+    radii = morgan_radii if morgan_radii is not None else DEFAULT_MORGAN_RADII
+    keys: list[str] = []
+    for fp_size in sizes:
+        for radius in radii:
+            keys.extend(
+                [
+                    f"morgan_r{radius}_bits_{fp_size}",
+                    f"morgan_r{radius}_count_{fp_size}",
+                ]
+            )
+        keys.extend(
+            [
+                f"rdkit_bits_{fp_size}",
+                f"rdkit_count_{fp_size}",
+                f"atom_pair_bits_{fp_size}",
+                f"atom_pair_count_{fp_size}",
+                f"torsion_bits_{fp_size}",
+                f"torsion_count_{fp_size}",
+            ]
+        )
+    if include_phys:
+        keys.append("rdkit_phys_props")
+    return keys
 
 
 def build_descriptor_matrix(name: str, mols: list) -> np.ndarray:
@@ -170,10 +296,6 @@ def build_descriptor_matrix(name: str, mols: list) -> np.ndarray:
     return build_fingerprint_matrix(name, mols)
 
 
-# Backwards compatibility (notebook / older code key names)
-fpspecs = {
-    "morgan_bits_2048_r2": FP_GENERATORS["morgan_bits_2048_r2"],
-    "rdkit_bits_2048": FP_GENERATORS["rdkit_bits_2048"],
-    "atom_pair_sparse": FP_GENERATORS["atom_pair_bits_2048"],
-    "torsion_sparse": FP_GENERATORS["torsion_bits_2048"],
-}
+# Legacy name for single constant (used in tests / imports)
+FP_SIZE = 2048
+FP_GENERATORS = {k: v["gen"] for k, v in FP_REGISTRY.items() if "bits" in k}
