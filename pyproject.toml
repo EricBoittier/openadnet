@@ -18,6 +18,7 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "scipy",
+    "umap-learn",
     "better-tables>=1.0.2",
     "tqdm",
 ]
@@ -33,4 +34,6 @@ py-modules = [
     "uncertainty",
     "reporting",
     "submission",
+    "tmap_viewer_html",
+    "fp_embedding_compare",
 ]
