@@ -15,12 +15,23 @@ from typing import Any, Literal
 import numpy as np
 import pandas as pd
 from scipy.stats import kendalltau, spearmanr
-from sklearn.metrics import mean_absolute_error, r2_score
 
 # Mirrors evaluation/config.py
 ACTIVITY_ENDPOINTS: tuple[str, ...] = ("pEC50",)
 ENDPOINTS_TO_LOG_TRANSFORM: frozenset[str] = frozenset()
 BOOTSTRAP_SAMPLES_DEFAULT: int = 1000
+
+
+def _mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    return float(np.mean(np.abs(y_true - y_pred)))
+
+
+def _r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    ss_res = float(np.sum((y_true - y_pred) ** 2))
+    ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
+    if ss_tot == 0.0:
+        return float("nan")
+    return float(1.0 - ss_res / ss_tot)
 
 
 def rae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -42,9 +53,9 @@ def _kendall_stat(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 
 ACTIVITY_METRICS: tuple[tuple[str, Callable[..., Any]], ...] = (
-    ("MAE", mean_absolute_error),
+    ("MAE", _mae),
     ("RAE", rae),
-    ("R2", r2_score),
+    ("R2", _r2),
     ("Spearman R", _spearman_stat),
     ("Kendall's Tau", _kendall_stat),
 )
@@ -144,7 +155,13 @@ def write_submission(
     if format == "csv":
         sub.to_csv(p, index=False)
     else:
-        sub.to_parquet(p, index=False)
+        try:
+            sub.to_parquet(p, index=False)
+        except ImportError as e:
+            raise ImportError(
+                "Parquet output requires an engine such as pyarrow. "
+                "Install with: pip install pyarrow"
+            ) from e
 
 
 def merge_predictions_with_truth(
