@@ -1,7 +1,8 @@
 """
 Example entrypoint: load PXR training data and run baseline CV grid.
 
-Requires network access to fetch HuggingFace CSVs on first import of `load_data`.
+First import of ``load_data`` may download CSVs from the Hub; later runs use the
+Hugging Face disk cache (and in-memory LRU cache). See ``load_data`` docstring.
 """
 
 from __future__ import annotations
