@@ -5,6 +5,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import gridspec
 
 
 def plot_target_distribution(
@@ -61,6 +62,82 @@ def plot_ci_width_vs_target(
     ax.set_ylabel("CI width")
     ax.set_title("Assay CI width vs target")
     return ax
+
+
+def plot_eda_distributions_and_correlations(
+    df: pd.DataFrame,
+    *,
+    exclude_cols: tuple[str, ...] | None = None,
+    hist_bins: int = 30,
+    figsize: tuple[float, float] | None = None,
+) -> plt.Figure:
+    """
+    Histograms for each numeric column and a Pearson correlation heatmap.
+
+    Excludes non-numeric columns (e.g. ``SMILES``, ``Molecule Name``, ``mol``) by default.
+    """
+    default_exclude = (
+        "mol",
+        "SMILES",
+        "Molecule Name",
+        "OCNT Batch",
+        "Split",
+    )
+    exclude = set(default_exclude)
+    if exclude_cols:
+        exclude.update(exclude_cols)
+
+    num = df.select_dtypes(include=[np.number]).copy()
+    for c in exclude:
+        if c in num.columns:
+            num = num.drop(columns=[c])
+
+    num = num.loc[:, num.notna().any()]
+    if num.shape[1] == 0:
+        raise ValueError("No numeric columns left after exclusions.")
+
+    n_cols = num.shape[1]
+    n_hist_rows = max(1, int(np.ceil(n_cols / 4)))
+    if figsize is None:
+        figsize = (14.0, 4.0 + 2.6 * n_hist_rows)
+
+    fig = plt.figure(figsize=figsize, constrained_layout=True)
+    gs = gridspec.GridSpec(2, 1, figure=fig, height_ratios=[1.0, 1.15])
+
+    ax_corr = fig.add_subplot(gs[0])
+    corr = num.corr(numeric_only=True)
+    im = ax_corr.imshow(corr.values, aspect="auto", cmap="coolwarm", vmin=-1, vmax=1)
+    ax_corr.set_xticks(np.arange(len(corr.columns)))
+    ax_corr.set_yticks(np.arange(len(corr.columns)))
+    short_labels = [
+        c.replace(" (-log10(molarity))", "")
+        .replace(" (log2FC vs. baseline)", "")
+        .replace(" (dimensionless)", "")[:32]
+        for c in corr.columns
+    ]
+    ax_corr.set_xticklabels(short_labels, rotation=55, ha="right", fontsize=7)
+    ax_corr.set_yticklabels(short_labels, fontsize=7)
+    ax_corr.set_title("Pearson correlation (numeric columns)")
+    fig.colorbar(im, ax=ax_corr, fraction=0.03, pad=0.02)
+
+    gsh = gs[1].subgridspec(n_hist_rows, 4, hspace=0.4, wspace=0.28)
+    for i, col in enumerate(num.columns):
+        r, c = divmod(i, 4)
+        ax_h = fig.add_subplot(gsh[r, c])
+        s = num[col].dropna()
+        ax_h.hist(s, bins=hist_bins, density=True, alpha=0.8, edgecolor="black", linewidth=0.3)
+        title = (
+            col.replace(" (-log10(molarity))", "")
+            .replace(" (log2FC vs. baseline)", "")
+            .replace(" (dimensionless)", "")
+        )
+        if len(title) > 28:
+            title = title[:25] + "…"
+        ax_h.set_title(title, fontsize=8)
+        ax_h.tick_params(axis="both", labelsize=6)
+
+    fig.suptitle("EDA: distributions and correlations", fontsize=12, y=1.02)
+    return fig
 
 
 def plot_predicted_vs_actual(
