@@ -326,3 +326,50 @@ PYTHONPATH=src python src/score_data.py
 ```
 
 Requires Hugging Face Hub access for the training CSV on first load (cached afterward). Set `HF_TOKEN` for higher rate limits.
+
+### Custom estimators and CV
+
+Use the same cross-validation loop as `score_data.py`, but pass your own **`regressors`** mapping (string label → unfitted scikit-learn regressor). Labels appear in the results table under `model`.
+
+**Steps**
+
+1. From the `openadnet` package directory, set `PYTHONPATH=src` so modules `baseline`, `load_data`, and `features_data` import correctly.
+2. Load the training table and build RDKit molecules from `SMILES` (same pattern as `score_data.py`).
+3. Build a **`regressors`** dict: keys are short names for reporting; values must be sklearn-style regressors implementing `fit` / `predict` (typically **unfitted** instances).
+4. Optionally set **`descriptor_names`** to a subset of `list_descriptor_names()` from `features_data` (otherwise the full grid runs).
+5. Optionally set **`BaselineCVConfig`** (`y_col`, `n_splits`, `shuffle`, `cv_random_state`, `model_random_state`).
+6. Call **`run_baseline_cv(...)`** with your `regressors` and config. Use **`cv_cache_path`** pointing to a separate JSON file if you do not want custom runs mixed into the default `outputs/baseline_cv_cache.json`, or set **`use_cv_cache=False`** to always refit. **`show_progress=False`** disables tqdm.
+
+**Pipeline wrapping:** `make_regressor_pipeline` in `baseline.py` prepends **`SimpleImputer`** and, only when the key is exactly **`ridge`**, **`elasticnet`**, or **`svr`**, a **`StandardScaler`**. Other keys get imputer + model only. If your estimator needs scaling under a different name, wrap it in a small sklearn **`Pipeline`** (e.g. `StandardScaler` then your regressor) and pass that as the dict value.
+
+**Example**
+
+```python
+from pathlib import Path
+
+from rdkit import Chem
+from sklearn.linear_model import HuberRegressor
+
+from baseline import BaselineCVConfig, run_baseline_cv
+from load_data import train
+
+mols = list(train["SMILES"].apply(Chem.MolFromSmiles))
+
+regressors = {
+    "huber": HuberRegressor(epsilon=1.35, max_iter=200),
+}
+
+results = run_baseline_cv(
+    train,
+    mols,
+    descriptor_names=["morgan_r2_bits_2048", "rdkit_phys_props"],
+    regressors=regressors,
+    config=BaselineCVConfig(n_splits=5),
+    cv_cache_path=Path("outputs/baseline_cv_custom.json"),
+    use_cv_cache=True,
+    show_progress=True,
+)
+print(results)
+```
+
+Run with: `PYTHONPATH=src python your_script.py` from the `openadnet` package root.
