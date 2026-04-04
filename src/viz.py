@@ -64,6 +64,86 @@ def plot_ci_width_vs_target(
     return ax
 
 
+def plot_pec50_lollipops(
+    df: pd.DataFrame,
+    *,
+    value_col: str = "pEC50",
+    lower_col: str = "pEC50_ci.lower (-log10(molarity))",
+    upper_col: str = "pEC50_ci.upper (-log10(molarity))",
+    label_col: str | None = "Molecule Name",
+    ascending: bool = True,
+    ax: plt.Axes | None = None,
+    figsize: tuple[float, float] | None = None,
+    ytick_max: int = 60,
+    color: str = "steelblue",
+    ecolor: str = "0.35",
+) -> plt.Axes:
+    """
+    Horizontal lollipop chart: rows ordered by ``value_col``, point at the estimate,
+    asymmetric error bars from assay CI lower/upper (``-log10(molarity)`` scale).
+
+    For large ``n``, y-axis labels are omitted unless ``n <= ytick_max``.
+    """
+    cols = [value_col, lower_col, upper_col]
+    if label_col is not None and label_col in df.columns:
+        use = df[[label_col, *cols]].dropna()
+    else:
+        use = df[cols].dropna()
+        label_col = None
+
+    use = use.sort_values(value_col, ascending=ascending).reset_index(drop=True)
+    n = len(use)
+    if n == 0:
+        raise ValueError("No rows with finite pEC50 and CI bounds.")
+
+    y = np.arange(n, dtype=float)
+    x = use[value_col].to_numpy()
+    lo = use[lower_col].to_numpy()
+    hi = use[upper_col].to_numpy()
+    xerr = np.vstack([np.clip(x - lo, 0, np.inf), np.clip(hi - x, 0, np.inf)])
+
+    if ax is None:
+        if figsize is None:
+            w = 8.0
+            h = max(5.0, min(0.14 * n, 48.0))
+            figsize = (w, h)
+        _, ax = plt.subplots(figsize=figsize)
+
+    # Stem from zero (or data min) for lollipop look; CI shown separately
+    xmin = float(np.nanmin(np.concatenate([lo, x])))
+    pad = 0.05 * (float(np.nanmax(hi)) - xmin + 1e-9)
+    x0 = min(0.0, xmin - pad) if xmin >= 0 else xmin - pad
+
+    ax.hlines(y, x0, x, color=color, alpha=0.45, linewidth=0.8, zorder=1)
+    ax.errorbar(
+        x,
+        y,
+        xerr=xerr,
+        fmt="o",
+        color=color,
+        ecolor=ecolor,
+        elinewidth=0.9,
+        capsize=1.5,
+        markersize=3.5,
+        zorder=2,
+    )
+    ax.set_xlabel("pEC50 (−log₁₀ molarity)")
+    ax.set_ylabel("")
+    ax.set_title("pEC50 (ordered) with assay CI")
+    ax.grid(axis="x", alpha=0.25)
+
+    if label_col is not None and n <= ytick_max:
+        labels = use[label_col].astype(str).tolist()
+        ax.set_yticks(y)
+        ax.set_yticklabels(labels, fontsize=7)
+    else:
+        ax.set_yticks([])
+
+    ax.invert_yaxis()
+    plt.tight_layout()
+    return ax
+
+
 def plot_eda_distributions_and_correlations(
     df: pd.DataFrame,
     *,

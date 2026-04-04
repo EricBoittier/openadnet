@@ -13,10 +13,10 @@ from rdkit.Chem import Descriptors, rdFingerprintGenerator
 FP_CACHE_VERSION = "v3_morgan_radii_0123"
 
 # Default fingerprint widths to evaluate (smaller → larger).
-DEFAULT_FP_SIZES: tuple[int, ...] = (512, 1024, 2048, 4096)
+DEFAULT_FP_SIZES: tuple[int, ...] = (512, 1024, 2048)
 
 # Morgan fingerprint radii (hop / bond-radius in RDKit Morgan implementation).
-DEFAULT_MORGAN_RADII: tuple[int, ...] = (0, 1, 2, 3)
+DEFAULT_MORGAN_RADII: tuple[int, ...] = (0, 1, 2)
 
 # Disk cache for per-molecule fingerprints / phys vectors. Set OPENADNET_FP_CACHE="" to disable
 # disk (in-process lru_cache only). Default: ~/.cache/openadnet/fingerprints
