@@ -8,3 +8,37 @@ wheels/
 
 # Virtual environments
 .venv
+
+# --- Large / generated artifacts ---
+# TMAP HTML/SVG, caches, exports (often MB–GB; regenerate with scripts)
+outputs/**
+!outputs/.gitkeep
+
+# Local caches (Hugging Face Hub, pip, etc.)
+.cache/
+.huggingface/
+**/.huggingface/
+
+# Test / tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Large binary / dump patterns (uncomment if you add these)
+# *.h5
+# *.hdf5
+# *.pkl
