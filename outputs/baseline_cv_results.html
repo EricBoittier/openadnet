@@ -1,11 +1,5 @@
-# openadnet
-
-PXR challenge baseline: molecular descriptors, sklearn regressors with cross-validation, optional plots (`viz`), and uncertainty helpers (`uncertainty`).
-
-## Latest baseline CV
-
-<!-- BASELINE_CV_TABLE_START -->
-
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Baseline CV</title></head><body>
 <div class="br-table-title br-align-center">Baseline cross-validation (pEC50)</div>
 <table class="br-table br-style-academic">
 <thead>
@@ -300,21 +294,4 @@ PXR challenge baseline: molecular descriptors, sklearn regressors with cross-val
 </tbody>
 </table>
 <div class="br-table-caption br-align-left">5-fold CV on the training set; metrics are out-of-fold. Sorted by mean RMSE (lower is better).</div>
-
-<!-- BASELINE_CV_TABLE_END -->
-
-### Artifacts
-
-After a run, see:
-
-- `outputs/baseline_cv_results.csv` — full numeric results
-- `outputs/baseline_cv_results.html` — the same table as standalone HTML (also embedded above via [better-tables](https://pypi.org/project/better-tables/))
-
-### Run
-
-```bash
-cd openadnet
-PYTHONPATH=src python src/score_data.py
-```
-
-Requires Hugging Face Hub access for the training CSV on first load (cached afterward). Set `HF_TOKEN` for higher rate limits.
+</body></html>
