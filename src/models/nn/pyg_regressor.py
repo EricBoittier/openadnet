@@ -100,13 +100,33 @@ class PyGMoleculeRegressor:
         learning_rate: float = 1e-3,
         weight_decay: float = 0.0,
         val_dataset: Optional[GraphRegressionDataset] = None,
+        early_stopping_patience: Optional[int] = None,
+        early_stopping_min_delta: float = 0.0,
         show_progress: bool = True,
     ) -> List[float]:
+        """Train the encoder; optionally monitor ``val_dataset`` each epoch.
+
+        When ``val_dataset`` is set, validation MSE is computed after each epoch,
+        the best weights (lowest validation loss) are restored at the end, and
+        training stops early if validation does not improve for
+        ``early_stopping_patience`` epochs. If ``early_stopping_patience`` is
+        ``None`` while ``val_dataset`` is set, patience defaults to ``10``. Use
+        ``0`` to disable early stopping while still selecting the best epoch by
+        validation loss.
+        """
         if train_dataset.n_tasks != self.n_tasks:
             raise ValueError(
                 f"dataset has n_tasks={train_dataset.n_tasks}, model expects {self.n_tasks}"
             )
         self._assert_dataset_descriptor(train_dataset)
+        if val_dataset is not None:
+            self._assert_dataset_descriptor(val_dataset)
+        patience_eff = early_stopping_patience
+        if val_dataset is not None and patience_eff is None:
+            patience_eff = 10
+        elif val_dataset is None:
+            patience_eff = 0
+
         self.model.train()
         loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         opt = torch.optim.Adam(
@@ -115,6 +135,9 @@ class PyGMoleculeRegressor:
             weight_decay=weight_decay,
         )
         losses: List[float] = []
+        best_val = float("inf")
+        best_state: Optional[dict[str, torch.Tensor]] = None
+        epochs_no_improve = 0
         epoch_bar = tqdm(range(epochs), disable=not show_progress, desc="epoch")
         for _ in epoch_bar:
             epoch_loss = 0.0
@@ -131,12 +154,31 @@ class PyGMoleculeRegressor:
                 n_batches += 1
             avg = epoch_loss / max(n_batches, 1)
             losses.append(avg)
-            epoch_bar.set_postfix(loss=avg)
+            postfix: dict[str, float] = {"loss": avg}
+            if val_dataset is not None:
+                vloss = self.evaluate_loss(val_dataset, batch_size=batch_size)
+                postfix["val_loss"] = vloss
+                if vloss < best_val - early_stopping_min_delta:
+                    best_val = vloss
+                    best_state = {
+                        k: v.detach().cpu().clone()
+                        for k, v in self.model.state_dict().items()
+                    }
+                    epochs_no_improve = 0
+                else:
+                    epochs_no_improve += 1
+                if patience_eff > 0 and epochs_no_improve >= patience_eff:
+                    if show_progress:
+                        tqdm.write(
+                            f"early stopping: no val improvement for {patience_eff} epochs"
+                        )
+                    break
+            epoch_bar.set_postfix(**postfix)
 
-        if val_dataset is not None:
-            vloss = self.evaluate_loss(val_dataset, batch_size=batch_size)
-            if show_progress:
-                tqdm.write(f"validation loss: {vloss:.6f}")
+        if best_state is not None:
+            self.model.load_state_dict(
+                {k: v.to(self.device) for k, v in best_state.items()}
+            )
         return losses
 
     @torch.no_grad()

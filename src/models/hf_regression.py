@@ -155,13 +155,26 @@ class HuggingFaceRegressor:
         learning_rate: float = 2e-5,
         weight_decay: float = 0.01,
         val_dataset: Optional[SmilesRegressionDataset] = None,
+        early_stopping_patience: Optional[int] = None,
+        early_stopping_min_delta: float = 0.0,
         show_progress: bool = True,
     ) -> List[float]:
-        """Train on a :class:`~models.data.transformer.SmilesRegressionDataset`."""
+        """Train on a :class:`~models.data.transformer.SmilesRegressionDataset`.
+
+        When ``val_dataset`` is set, validation loss is computed after each epoch,
+        the best checkpoint is restored at the end, and early stopping applies
+        unless ``early_stopping_patience=0`` (``None`` defaults to patience ``10``).
+        """
         if train_dataset.n_tasks != self.n_tasks:
             raise ValueError(
                 f"dataset has n_tasks={train_dataset.n_tasks}, model expects {self.n_tasks}"
             )
+        patience_eff = early_stopping_patience
+        if val_dataset is not None and patience_eff is None:
+            patience_eff = 10
+        elif val_dataset is None:
+            patience_eff = 0
+
         self.model.train()
         collate = self._collate(return_labels=True)
         loader = DataLoader(
@@ -176,6 +189,9 @@ class HuggingFaceRegressor:
             weight_decay=weight_decay,
         )
         losses: List[float] = []
+        best_val = float("inf")
+        best_state: Optional[dict[str, torch.Tensor]] = None
+        epochs_no_improve = 0
         epoch_bar = tqdm(range(epochs), disable=not show_progress, desc="epoch")
         for _ in epoch_bar:
             epoch_loss = 0.0
@@ -193,14 +209,31 @@ class HuggingFaceRegressor:
                 n_batches += 1
             avg = epoch_loss / max(n_batches, 1)
             losses.append(avg)
-            epoch_bar.set_postfix(loss=avg)
+            postfix: dict[str, float] = {"loss": avg}
+            if val_dataset is not None:
+                vloss = self.evaluate_loss(val_dataset, batch_size=batch_size)
+                postfix["val_loss"] = vloss
+                if vloss < best_val - early_stopping_min_delta:
+                    best_val = vloss
+                    best_state = {
+                        k: v.detach().cpu().clone()
+                        for k, v in self.model.state_dict().items()
+                    }
+                    epochs_no_improve = 0
+                else:
+                    epochs_no_improve += 1
+                if patience_eff > 0 and epochs_no_improve >= patience_eff:
+                    if show_progress:
+                        tqdm.write(
+                            f"early stopping: no val improvement for {patience_eff} epochs"
+                        )
+                    break
+            epoch_bar.set_postfix(**postfix)
 
-        if val_dataset is not None:
-            self.model.eval()
-            vloss = self.evaluate_loss(val_dataset, batch_size=batch_size)
-            if show_progress:
-                tqdm.write(f"validation loss: {vloss:.6f}")
-            self.model.train()
+        if best_state is not None:
+            self.model.load_state_dict(
+                {k: v.to(self.device) for k, v in best_state.items()}
+            )
         return losses
 
     @torch.no_grad()
