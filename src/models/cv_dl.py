@@ -5,13 +5,14 @@ from __future__ import annotations
 from typing import Optional, Sequence, Union
 
 import numpy as np
-import torch
 import pandas as pd
+import torch
+from sklearn.base import clone
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold
 from tqdm.auto import tqdm
 
-from baseline import BaselineCVConfig
+from baseline import BaselineCVConfig, default_regressors
 from models.data import graph_regression_from_dataframe, smiles_regression_from_dataframe
 from models.nn.pyg_regressor import PyGMoleculeRegressor
 from models.hf_regression import HuggingFaceRegressor
