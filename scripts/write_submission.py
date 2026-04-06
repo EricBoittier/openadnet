@@ -3,7 +3,7 @@
 Validate activity predictions and write a challenge submission CSV (or Parquet).
 
 Predictions file options:
-  - Two columns: Molecule Name, pEC50
+  - Two columns: Molecule Name, pEC50 (SMILES are taken from the blind test table)
   - One numeric column only: values must align with test row order (same as Hugging Face test CSV).
 
 Usage (from ``openadnet/``):
@@ -41,12 +41,23 @@ def _load_predictions(path: Path, single_column_order: bool, test_df: pd.DataFra
                 f"Predictions rows {len(pred)} != test rows {len(test_df)}."
             )
         return pd.DataFrame(
-            {"Molecule Name": test_df["Molecule Name"].values, "pEC50": pred[col].astype(float).values}
+            {
+                "SMILES": test_df["SMILES"].values,
+                "Molecule Name": test_df["Molecule Name"].values,
+                "pEC50": pred[col].astype(float).values,
+            }
         )
     for c in ("Molecule Name", "pEC50"):
         if c not in pred.columns:
             raise ValueError(f"Predictions CSV must contain column {c!r} (or use --single-column-order).")
-    return pred[["Molecule Name", "pEC50"]].copy()
+    out = pred[["Molecule Name", "pEC50"]].copy()
+    smiles_map = test_df.set_index("Molecule Name")["SMILES"]
+    out.insert(0, "SMILES", out["Molecule Name"].map(smiles_map))
+    if out["SMILES"].isna().any():
+        raise ValueError(
+            "Predictions contain Molecule Name(s) not present in the blind test set (cannot fill SMILES)."
+        )
+    return out[["SMILES", "Molecule Name", "pEC50"]]
 
 
 def main() -> None:

@@ -71,10 +71,15 @@ def build_activity_submission(
     predictions: np.ndarray | pd.Series,
     *,
     id_col: str = "Molecule Name",
+    smiles_col: str = "SMILES",
     value_col: str = "pEC50",
 ) -> pd.DataFrame:
     """
     Build a submission table: one row per test compound with predicted ``value_col``.
+
+    Includes ``smiles_col`` and ``id_col`` from ``test_df`` (required by challenge
+    ``validate_activity_submission``). Column order is
+    ``SMILES``, ``Molecule Name``, ``pEC50`` when using defaults.
 
     If ``predictions`` is a 1-D array, it must have length ``len(test_df)`` and is
     aligned to ``test_df`` row order. If it is a ``Series``, it must be indexed by
@@ -82,6 +87,8 @@ def build_activity_submission(
     """
     if id_col not in test_df.columns:
         raise KeyError(f"test_df missing column {id_col!r}")
+    if smiles_col not in test_df.columns:
+        raise KeyError(f"test_df missing column {smiles_col!r}")
 
     if isinstance(predictions, pd.Series):
         ids = test_df[id_col].tolist()
@@ -99,7 +106,13 @@ def build_activity_submission(
                 f"predictions length {vals.shape[0]} != len(test_df) {len(test_df)}"
             )
 
-    out = pd.DataFrame({id_col: test_df[id_col].values, value_col: vals})
+    out = pd.DataFrame(
+        {
+            smiles_col: test_df[smiles_col].values,
+            id_col: test_df[id_col].values,
+            value_col: vals,
+        }
+    )
     return out
 
 
@@ -108,22 +121,38 @@ def validate_submission(
     test_df: pd.DataFrame,
     *,
     id_col: str = "Molecule Name",
+    smiles_col: str = "SMILES",
     value_col: str = "pEC50",
 ) -> None:
     """
-    Validate submission against the blind test table (expected ids, no NaNs).
+    Validate submission against the blind test table (expected ids, SMILES, no NaNs).
+
+    Aligns with challenge ``validate_activity_submission`` (SMILES + Molecule Name
+    identifiers, numeric finite ``value_col``).
 
     Raises ``ValueError`` with an actionable message if checks fail.
     """
-    for col in (id_col, value_col):
+    for col in (smiles_col, id_col, value_col):
         if col not in sub.columns:
             raise ValueError(f"Submission missing required column {col!r}")
 
     if id_col not in test_df.columns:
         raise KeyError(f"test_df missing column {id_col!r}")
+    if smiles_col not in test_df.columns:
+        raise KeyError(f"test_df missing column {smiles_col!r}")
 
     if len(sub) != len(test_df):
         raise ValueError(f"Submission row count {len(sub)} != test row count {len(test_df)}")
+
+    null_id = sub[[smiles_col, id_col]].isna().any(axis=1).sum()
+    if null_id:
+        raise ValueError(
+            f"Submission has {null_id} row(s) with missing {smiles_col!r} or {id_col!r}."
+        )
+
+    dup = sub[id_col].duplicated().sum()
+    if dup:
+        raise ValueError(f"Submission has {dup} duplicated {id_col!r} value(s).")
 
     sub_ids = sub[id_col].astype(str).values
     test_ids = test_df[id_col].astype(str).values
@@ -133,14 +162,32 @@ def validate_submission(
             "(duplicate or missing IDs)."
         )
 
-    if sub[value_col].isna().any():
-        raise ValueError(f"Submission column {value_col!r} contains NaN.")
+    # SMILES must match the blind test table for each molecule id (string compare).
+    s_ids = sub[[id_col, smiles_col]].rename(
+        columns={smiles_col: "__smiles_sub"}
+    )
+    t_ids = test_df[[id_col, smiles_col]].rename(
+        columns={smiles_col: "__smiles_test"}
+    )
+    merged = s_ids.merge(t_ids, on=id_col, how="inner")
+    if len(merged) != len(sub):
+        raise ValueError(
+            f"Could not match every submission row to blind test {id_col} (merged {len(merged)} vs submission {len(sub)})."
+        )
+    if not (merged["__smiles_sub"].astype(str) == merged["__smiles_test"].astype(str)).all():
+        raise ValueError(
+            f"One or more {smiles_col!r} values do not match the blind test table."
+        )
 
-    if not np.issubdtype(sub[value_col].dtype, np.number):
-        try:
-            sub[value_col].astype(float)
-        except (TypeError, ValueError) as e:
-            raise ValueError(f"Submission column {value_col!r} is not numeric.") from e
+    numeric = pd.to_numeric(sub[value_col], errors="coerce")
+    if numeric.isna().any():
+        raise ValueError(
+            f"Submission column {value_col!r} contains non-numeric or missing value(s)."
+        )
+    if not np.isfinite(numeric.to_numpy(dtype=float)).all():
+        raise ValueError(
+            f"Submission column {value_col!r} contains non-finite value(s) (inf or -inf)."
+        )
 
 
 def write_submission(

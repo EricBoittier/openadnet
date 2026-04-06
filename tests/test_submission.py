@@ -28,46 +28,70 @@ class TestValidateSubmission(unittest.TestCase):
         test_df = pd.DataFrame(
             {"Molecule Name": ["A", "B", "C"], "SMILES": ["x", "y", "z"]}
         )
-        sub = pd.DataFrame({"Molecule Name": ["B", "A", "C"], "pEC50": [1.0, 2.0, 3.0]})
+        sub = pd.DataFrame(
+            {
+                "SMILES": ["y", "x", "z"],
+                "Molecule Name": ["B", "A", "C"],
+                "pEC50": [1.0, 2.0, 3.0],
+            }
+        )
         validate_submission(sub, test_df)
 
     def test_wrong_length(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["A", "B"]})
-        sub = pd.DataFrame({"Molecule Name": ["A"], "pEC50": [1.0]})
+        test_df = pd.DataFrame({"Molecule Name": ["A", "B"], "SMILES": ["s1", "s2"]})
+        sub = pd.DataFrame(
+            {"SMILES": ["s1"], "Molecule Name": ["A"], "pEC50": [1.0]}
+        )
         with self.assertRaises(ValueError) as ctx:
             validate_submission(sub, test_df)
         self.assertIn("row count", str(ctx.exception))
 
     def test_wrong_ids(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["A", "B"]})
-        sub = pd.DataFrame({"Molecule Name": ["A", "X"], "pEC50": [1.0, 2.0]})
+        test_df = pd.DataFrame({"Molecule Name": ["A", "B"], "SMILES": ["s1", "s2"]})
+        sub = pd.DataFrame(
+            {
+                "SMILES": ["s1", "sx"],
+                "Molecule Name": ["A", "X"],
+                "pEC50": [1.0, 2.0],
+            }
+        )
         with self.assertRaises(ValueError) as ctx:
             validate_submission(sub, test_df)
         self.assertIn("multiset", str(ctx.exception))
 
     def test_nan_prediction(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["A", "B"]})
-        sub = pd.DataFrame({"Molecule Name": ["A", "B"], "pEC50": [1.0, np.nan]})
+        test_df = pd.DataFrame({"Molecule Name": ["A", "B"], "SMILES": ["s1", "s2"]})
+        sub = pd.DataFrame(
+            {
+                "SMILES": ["s1", "s2"],
+                "Molecule Name": ["A", "B"],
+                "pEC50": [1.0, np.nan],
+            }
+        )
         with self.assertRaises(ValueError) as ctx:
             validate_submission(sub, test_df)
-        self.assertIn("NaN", str(ctx.exception))
+        self.assertIn("missing", str(ctx.exception).lower())
 
 
 class TestBuildSubmission(unittest.TestCase):
     def test_array_order(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["m1", "m2"], "x": [1, 2]})
+        test_df = pd.DataFrame(
+            {"Molecule Name": ["m1", "m2"], "SMILES": ["a", "b"], "x": [1, 2]}
+        )
         sub = build_activity_submission(test_df, np.array([5.0, 6.0]))
         self.assertListEqual(sub["pEC50"].tolist(), [5.0, 6.0])
         self.assertListEqual(sub["Molecule Name"].tolist(), ["m1", "m2"])
+        self.assertListEqual(sub["SMILES"].tolist(), ["a", "b"])
+        self.assertListEqual(list(sub.columns), ["SMILES", "Molecule Name", "pEC50"])
 
     def test_series_reindex(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["m1", "m2"]})
+        test_df = pd.DataFrame({"Molecule Name": ["m1", "m2"], "SMILES": ["a", "b"]})
         s = pd.Series([6.0, 5.0], index=["m2", "m1"])
         sub = build_activity_submission(test_df, s)
         self.assertListEqual(sub["pEC50"].tolist(), [5.0, 6.0])
 
     def test_series_missing_raises(self) -> None:
-        test_df = pd.DataFrame({"Molecule Name": ["m1", "m2"]})
+        test_df = pd.DataFrame({"Molecule Name": ["m1", "m2"], "SMILES": ["a", "b"]})
         s = pd.Series([5.0], index=["m1"])
         with self.assertRaises(ValueError):
             build_activity_submission(test_df, s)
@@ -94,7 +118,7 @@ class TestScoreActivity(unittest.TestCase):
 
 class TestWriteSubmission(unittest.TestCase):
     def test_csv_roundtrip(self) -> None:
-        sub = pd.DataFrame({"Molecule Name": ["a"], "pEC50": [3.14]})
+        sub = pd.DataFrame({"SMILES": ["C"], "Molecule Name": ["a"], "pEC50": [3.14]})
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "sub.csv"
             write_submission(path, sub, format="csv")
