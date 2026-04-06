@@ -157,13 +157,24 @@ class HuggingFaceRegressor:
         val_dataset: Optional[SmilesRegressionDataset] = None,
         early_stopping_patience: Optional[int] = None,
         early_stopping_min_delta: float = 0.0,
+        lr_reduce_factor: float = 0.5,
+        max_lr_reductions: int = 5,
+        min_lr: float = 1e-8,
         show_progress: bool = True,
     ) -> List[float]:
         """Train on a :class:`~models.data.transformer.SmilesRegressionDataset`.
 
-        When ``val_dataset`` is set, validation loss is computed after each epoch,
-        the best checkpoint is restored at the end, and early stopping applies
-        unless ``early_stopping_patience=0`` (``None`` defaults to patience ``10``).
+        When ``val_dataset`` is set, validation loss is computed after each epoch
+        and the best checkpoint is restored at the end.
+
+        If validation does not improve for ``early_stopping_patience`` epochs
+        (default ``10`` when ``early_stopping_patience`` is ``None``), the
+        learning rate is multiplied by ``lr_reduce_factor`` (clamped to at least
+        ``min_lr``), the no-improvement counter resets, and training continues.
+        After ``max_lr_reductions`` such LR decreases, training stops. If
+        ``early_stopping_patience`` is ``0``, no LR reductions are applied and
+        training runs for the full ``epochs`` (best validation checkpoint is
+        still restored when ``val_dataset`` is provided).
         """
         if train_dataset.n_tasks != self.n_tasks:
             raise ValueError(
@@ -174,6 +185,10 @@ class HuggingFaceRegressor:
             patience_eff = 10
         elif val_dataset is None:
             patience_eff = 0
+        if max_lr_reductions < 1:
+            raise ValueError("max_lr_reductions must be >= 1")
+        if not (0.0 < lr_reduce_factor < 1.0):
+            raise ValueError("lr_reduce_factor must be in (0, 1)")
 
         self.model.train()
         collate = self._collate(return_labels=True)
@@ -192,6 +207,7 @@ class HuggingFaceRegressor:
         best_val = float("inf")
         best_state: Optional[dict[str, torch.Tensor]] = None
         epochs_no_improve = 0
+        lr_reduce_count = 0
         epoch_bar = tqdm(range(epochs), disable=not show_progress, desc="epoch")
         for _ in epoch_bar:
             epoch_loss = 0.0
@@ -209,7 +225,8 @@ class HuggingFaceRegressor:
                 n_batches += 1
             avg = epoch_loss / max(n_batches, 1)
             losses.append(avg)
-            postfix: dict[str, float] = {"loss": avg}
+            cur_lr = float(opt.param_groups[0]["lr"])
+            postfix: dict[str, float] = {"loss": avg, "lr": cur_lr}
             if val_dataset is not None:
                 vloss = self.evaluate_loss(val_dataset, batch_size=batch_size)
                 postfix["val_loss"] = vloss
@@ -223,11 +240,21 @@ class HuggingFaceRegressor:
                 else:
                     epochs_no_improve += 1
                 if patience_eff > 0 and epochs_no_improve >= patience_eff:
+                    lr_reduce_count += 1
+                    for pg in opt.param_groups:
+                        pg["lr"] = max(float(pg["lr"]) * lr_reduce_factor, min_lr)
+                    epochs_no_improve = 0
                     if show_progress:
                         tqdm.write(
-                            f"early stopping: no val improvement for {patience_eff} epochs"
+                            f"val plateau: reducing lr to {opt.param_groups[0]['lr']:.2e} "
+                            f"({lr_reduce_count}/{max_lr_reductions})"
                         )
-                    break
+                    if lr_reduce_count >= max_lr_reductions:
+                        if show_progress:
+                            tqdm.write(
+                                f"stopping: reached max_lr_reductions={max_lr_reductions}"
+                            )
+                        break
             epoch_bar.set_postfix(**postfix)
 
         if best_state is not None:
