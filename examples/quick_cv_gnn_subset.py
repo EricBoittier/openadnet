@@ -34,6 +34,12 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--hidden-dim", type=int, default=48)
     p.add_argument("--num-layers", type=int, default=2)
+    p.add_argument(
+        "--descriptor-name",
+        type=str,
+        default=None,
+        help="Optional: broadcast baseline fingerprint onto each node",
+    )
     args = p.parse_args()
 
     small = train.head(args.n_rows).copy()
@@ -48,6 +54,7 @@ def main() -> None:
         smiles_col="SMILES",
         target_cols=["pEC50"],
         architecture=args.architecture,
+        descriptor_name=args.descriptor_name,
         config=cfg,
         epochs=args.epochs,
         batch_size=args.batch_size,

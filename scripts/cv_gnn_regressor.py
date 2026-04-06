@@ -48,6 +48,12 @@ def main() -> None:
     p.add_argument("--hidden-dim", type=int, default=64)
     p.add_argument("--num-layers", type=int, default=3)
     p.add_argument(
+        "--descriptor-name",
+        type=str,
+        default=None,
+        help="Optional: broadcast baseline fingerprint row onto each node (features_data key)",
+    )
+    p.add_argument(
         "--verbose-fit",
         action="store_true",
         help="Show tqdm epoch/batch bars during each fold's training",
@@ -95,10 +101,16 @@ def main() -> None:
         from models.cv_dl import prepare_regression_frame
 
         work = prepare_regression_frame(train, args.smiles_col, list(args.targets))
-        full_ds = graph_regression_from_dataframe(work, args.smiles_col, list(args.targets))
+        full_ds = graph_regression_from_dataframe(
+            work,
+            args.smiles_col,
+            list(args.targets),
+            descriptor_name=args.descriptor_name,
+        )
         model = PyGMoleculeRegressor(
             n_tasks=len(args.targets),
             architecture=args.architecture,
+            descriptor_name=args.descriptor_name,
             hidden_dim=args.hidden_dim,
             num_layers=args.num_layers,
             gat_heads=args.gat_heads,

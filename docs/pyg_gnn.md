@@ -128,6 +128,20 @@ sequenceDiagram
 
 ---
 
+## Molecule-level descriptors as node features
+
+Baseline **per-molecule** fingerprints (same disk cache as sklearn in [`features_data.py`](../src/features_data.py)) can be concatenated to **every atom row** in [`mol_to_pyg_data`](../src/models/data/graph.py). This is **not** the JSON file `outputs/baseline_cv_cache.json` (that file stores CV metrics only).
+
+- Width helper: [`descriptor_dim`](../src/features_data.py)  
+- Concat size: [`atom_feature_dim_with_descriptor`](../src/models/data/graph.py)  
+- Dataset / DataFrame: `GraphRegressionDataset(..., descriptor_name=...)` and [`graph_regression_from_dataframe`](../src/models/data/graph.py)  
+- Regressor: [`PyGMoleculeRegressor(..., descriptor_name=...)`](../src/models/nn/pyg_regressor.py)  
+- Notebook-oriented helpers: [`examples/notebook_graph_with_descriptors.py`](../examples/notebook_graph_with_descriptors.py) (add **repo root** to `sys.path` if you `import examples...`, or call the same functions via `models` as in the notebook)
+
+Large fingerprints (e.g. 4096 bits) on every node increase memory; prefer **`morgan_r2_bits_512`** or **`rdkit_phys_props`** for quick runs.
+
+---
+
 ## Tests
 
 - Encoder smoke tests: [`tests/test_pyg_architectures.py`](../tests/test_pyg_architectures.py)  
@@ -137,4 +151,4 @@ sequenceDiagram
 
 ## Checkpoint format
 
-`PyGMoleculeRegressor.save_pretrained` writes `gnn_regression.pt` with keys such as `architecture`, `in_dim`, `edge_dim`, `hidden_dim`, `num_layers`, `gat_heads` (see [`save_pretrained`](../src/models/nn/pyg_regressor.py#L142) / [`load_pretrained`](../src/models/nn/pyg_regressor.py#L159)). Older checkpoints without `architecture` load as **`gin`**.
+`PyGMoleculeRegressor.save_pretrained` writes `gnn_regression.pt` with keys such as `architecture`, `in_dim`, `edge_dim`, `hidden_dim`, `num_layers`, `gat_heads`, `descriptor_name` (see [`save_pretrained`](../src/models/nn/pyg_regressor.py#L142) / [`load_pretrained`](../src/models/nn/pyg_regressor.py#L159)). Older checkpoints without `architecture` load as **`gin`**; missing `descriptor_name` means **no** extra descriptor channels.
