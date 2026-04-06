@@ -18,6 +18,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import torch
+
 from baseline import BaselineCVConfig
 from load_data import train
 from models.cv_dl import run_hf_regressor_cv
@@ -51,6 +53,11 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=2e-5)
     p.add_argument("--max-length", type=int, default=128)
     p.add_argument(
+        "--cpu",
+        action="store_true",
+        help="Force CPU (recommended if you see CUDA device-side assert errors)",
+    )
+    p.add_argument(
         "--output",
         type=Path,
         default=None,
@@ -82,6 +89,7 @@ def main() -> None:
         learning_rate=args.lr,
         max_length=args.max_length,
         show_progress=True,
+        device=torch.device("cpu") if args.cpu else None,
     )
     print("Per-fold metrics:")
     print(fold_df.to_string(index=False))
@@ -102,6 +110,7 @@ def main() -> None:
             n_tasks=len(args.targets),
             tokenizer_name_or_path=args.tokenizer,
             max_length=args.max_length,
+            device=torch.device("cpu") if args.cpu else None,
         )
         model.fit(
             full_ds,

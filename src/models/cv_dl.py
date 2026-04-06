@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
+import torch
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold
@@ -71,8 +72,12 @@ def run_hf_regressor_cv(
     weight_decay: float = 0.01,
     max_length: Optional[int] = 256,
     show_progress: bool = True,
+    device: Optional[torch.device] = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """K-fold CV for :class:`~models.hf_regression.HuggingFaceRegressor`.
+
+    Use ``device=torch.device("cpu")`` or ``OPENADNET_FORCE_CPU=1`` if CUDA raises
+    device-side asserts in notebooks.
 
     Returns
     -------
@@ -109,6 +114,7 @@ def run_hf_regressor_cv(
             n_tasks=n_tasks,
             tokenizer_name_or_path=tokenizer_name_or_path,
             max_length=max_length,
+            device=device,
         )
         model.fit(
             train_ds,
@@ -215,6 +221,7 @@ def run_chemberta_regressor_cv(
     weight_decay: float = 0.01,
     max_length: Optional[int] = 256,
     show_progress: bool = True,
+    device: Optional[torch.device] = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """K-fold CV using :class:`~models.pt.chemberta.ChembertaRegressor` (same loop as HF)."""
     from models.pt.chemberta import ChembertaRegressor
@@ -247,6 +254,7 @@ def run_chemberta_regressor_cv(
             n_tasks=n_tasks,
             tokenizer_path=tokenizer_path,
             max_length=max_length,
+            device=device,
         )
         model.fit(
             train_ds,

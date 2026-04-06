@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional, Union
 
@@ -9,12 +11,53 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    PreTrainedModel,
+)
 
 from models.data.transformer import SmilesRegressionDataset, smiles_regression_collate_fn
 
 if TYPE_CHECKING:
-    from transformers import PreTrainedModel, PreTrainedTokenizer
+    from transformers import PreTrainedTokenizer
+
+
+def _default_device(requested: Optional[torch.device]) -> torch.device:
+    if requested is not None:
+        return requested
+    if os.environ.get("OPENADNET_FORCE_CPU", "").lower() in ("1", "true", "yes"):
+        return torch.device("cpu")
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
+
+
+def _sync_tokenizer_embeddings(model: "PreTrainedModel", tokenizer: "PreTrainedTokenizer") -> None:
+    """Resize word embeddings when tokenizer length differs (avoids OOB indices on GPU)."""
+    n_tok = len(tokenizer)
+    n_emb = int(model.get_input_embeddings().weight.shape[0])
+    if n_tok != n_emb:
+        model.resize_token_embeddings(n_tok)
+
+
+def _place_model_on_device(model: "PreTrainedModel", device: torch.device) -> torch.device:
+    """Move model to ``device``; fall back to CPU if CUDA raises (bad driver, prior assert, etc.)."""
+    try:
+        model.to(device)
+        return device
+    except Exception as e:  # noqa: BLE001 — surface CUDA/Accelerator failures as CPU fallback
+        if device.type != "cuda":
+            raise
+        warnings.warn(
+            f"Failed to place model on {device} ({type(e).__name__}: {e!s}). "
+            "Retrying on CPU. Set OPENADNET_FORCE_CPU=1 to skip GPU, or use device=torch.device('cpu').",
+            UserWarning,
+            stacklevel=3,
+        )
+        cpu = torch.device("cpu")
+        model.to(cpu)
+        return cpu
 
 
 def _ensure_pad_token(tokenizer: "PreTrainedTokenizer") -> None:
@@ -30,7 +73,14 @@ def _ensure_pad_token(tokenizer: "PreTrainedTokenizer") -> None:
 
 
 class HuggingFaceRegressor:
-    """Regression using ``AutoModelForSequenceClassification`` (``problem_type='regression'``)."""
+    """Regression using ``AutoModelForSequenceClassification`` (``problem_type='regression'``).
+
+    **Device:** Defaults to CUDA when available. Set environment variable
+    ``OPENADNET_FORCE_CPU=1`` or pass ``device=torch.device("cpu")`` if you hit
+    CUDA device-side asserts (common with tokenizer/model vocab skew; we also
+    call ``resize_token_embeddings`` when the tokenizer length differs from the
+    loaded checkpoint).
+    """
 
     def __init__(
         self,
@@ -46,9 +96,7 @@ class HuggingFaceRegressor:
         self.n_tasks = n_tasks
         self.max_length = max_length
         self.model_name_or_path = model_name_or_path
-        self.device = device or torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        self.device = _default_device(device)
         tok_src = tokenizer_name_or_path or model_name_or_path
         self.tokenizer = AutoTokenizer.from_pretrained(tok_src)
         _ensure_pad_token(self.tokenizer)
@@ -58,9 +106,10 @@ class HuggingFaceRegressor:
             problem_type="regression",
             ignore_mismatched_sizes=True,
         )
+        _sync_tokenizer_embeddings(self.model, self.tokenizer)
         if self.tokenizer.pad_token_id is not None and self.model.config.pad_token_id is None:
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
-        self.model.to(self.device)
+        self.device = _place_model_on_device(self.model, self.device)
 
     @classmethod
     def from_pretrained(
@@ -232,7 +281,8 @@ class HuggingFaceRegressor:
             problem_type="regression",
             ignore_mismatched_sizes=True,
         )
-        self.model.to(self.device)
+        _sync_tokenizer_embeddings(self.model, self.tokenizer)
         if self.tokenizer.pad_token_id is not None:
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.device = _place_model_on_device(self.model, self.device)
         self.model_name_or_path = model_name_or_path
