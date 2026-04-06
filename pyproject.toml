@@ -28,7 +28,6 @@ dl = [
     "torch>=2.0",
     "transformers>=4.36",
     "torch-geometric>=2.4",
-    "deepchem>=2.5.0",
 ]
 
 [tool.pylint.main]

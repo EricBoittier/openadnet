@@ -12,8 +12,8 @@ class ScaledDotProductAttention(nn.Module):
 
     Example
     -------
-    >>> from deepchem.models import ScaledDotProductAttention as SDPA
-    >>> attn = SDPA()
+    >>> from models.pt.attention import ScaledDotProductAttention
+    >>> attn = ScaledDotProductAttention()
     >>> x = torch.ones(1, 5)
     >>> # Linear layers for making query, key, value
     >>> Q, K, V = nn.Parameter(torch.ones(5)), nn.Parameter(torch.ones(5)), nn.Parameter(torch.ones(5))
