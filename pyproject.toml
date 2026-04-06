@@ -58,6 +58,7 @@ py-modules = [
     "submission",
     "tmap_viewer_html",
     "fp_embedding_compare",
+    "morgan_fp_viz",
 ]
 
 [tool.setuptools.packages.find]
