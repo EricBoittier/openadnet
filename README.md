@@ -1,6 +1,41 @@
 # openadnet
 
-PXR challenge baseline: molecular descriptors, sklearn regressors with cross-validation, optional plots (`viz`), and uncertainty helpers (`uncertainty`).
+Code and baselines for **PXR (pregnane X receptor) activity** modeling on the OpenADMET / Hugging Face challenge data: RDKit fingerprints plus classical regressors, optional **PyTorch Geometric** graph models, **HuggingFace** encoder regressors, **delta learning**, **ensembles**, **submission** CSV helpers, **uncertainty** (including conformal-style tooling), and **visualization** (e.g. TMAP, plots in `viz`).
+
+| Topic | Where to start |
+|--------|----------------|
+| Install & optional DL stack | [Installation](#installation) |
+| Sklearn CV grid & caching | [Fingerprint grid](#fingerprint-grid), [CV result cache](#cv-result-cache) |
+| Full baseline leaderboard | [Latest baseline CV](#latest-baseline-cv) |
+| PyG SMILES → graph → regression | [`docs/pyg_gnn.md`](docs/pyg_gnn.md) |
+| Challenge submission CSV | [`src/submission.py`](src/submission.py), [`scripts/write_submission.py`](scripts/write_submission.py) |
+
+## Installation
+
+From the repository root (Python **≥ 3.13**):
+
+```bash
+pip install -e .
+```
+
+Optional extras (see [`pyproject.toml`](pyproject.toml)):
+
+```bash
+pip install -e ".[dl]"     # torch, transformers, torch-geometric — GNNs & HF regressors
+pip install -e ".[hydra]"  # Hydra for experiment sweeps (e.g. `scripts/hydra_gnn_sweep.py`)
+```
+
+Training data are loaded via Hugging Face Hub on first use and cached locally; set `HF_TOKEN` for higher rate limits.
+
+## Repository layout (high level)
+
+- **`src/baseline.py`**, **`src/features_data.py`**, **`src/score_data.py`** — descriptor grid, CV loop, default baseline run.
+- **`src/models/`** — `GNNRegressor`, `HuggingFaceRegressor`, ensembles, `cv_dl` for neural CV; **`src/models/data/graph.py`** builds PyG graphs from SMILES.
+- **`src/delta_learning.py`** — delta-learning helpers used with the baseline / DL stack.
+- **`src/submission.py`** — validate predictions and write challenge-shaped submission files.
+- **`src/uncertainty/`** — uncertainty and related plotting utilities.
+- **`scripts/`** — CV drivers (`cv_gnn_regressor.py`, `cv_hf_regressor.py`, …), submission helpers, TMAP HTML, etc.
+- **`examples/`** — small runnable snippets (HF CV, GNN subset, holdout fits).
 
 ### Fingerprint grid
 
@@ -2086,6 +2121,8 @@ PYTHONPATH=src python src/score_data.py
 ```
 
 Requires Hugging Face Hub access for the training CSV on first load (cached afterward). Set `HF_TOKEN` for higher rate limits.
+
+Graph- and transformer-based CV (optional `openadnet[dl]`) is wired through `scripts/cv_gnn_regressor.py`, `scripts/cv_hf_regressor.py`, and related drivers under `scripts/`; see [`docs/pyg_gnn.md`](docs/pyg_gnn.md) for the PyG pipeline.
 
 ### Custom estimators and CV
 
