@@ -5,8 +5,9 @@ K-fold cross-validation for :class:`~models.nn.pyg_regressor.PyGMoleculeRegresso
 
 Run from the repo root::
 
-    PYTHONPATH=src python scripts/cv_gnn_regressor.py --epochs 2 --n-splits 3
-    PYTHONPATH=src python scripts/cv_gnn_regressor.py --architecture mpnn --epochs 2
+    PYTHONPATH=src python scripts/cv_gnn_regressor.py --n-splits 5
+    PYTHONPATH=src python scripts/cv_gnn_regressor.py --architecture mpnn --epochs 80
+    PYTHONPATH=src python scripts/cv_gnn_regressor.py --cpu --epochs 2
 
 Requires ``pip install openadnet[dl]``.
 """
@@ -15,6 +16,8 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+
+import torch
 
 from baseline import BaselineCVConfig
 from load_data import train
@@ -30,7 +33,12 @@ def main() -> None:
     p.add_argument("--targets", nargs="+", default=["pEC50"])
     p.add_argument("--n-splits", type=int, default=3)
     p.add_argument("--cv-seed", type=int, default=0)
-    p.add_argument("--epochs", type=int, default=2)
+    p.add_argument(
+        "--epochs",
+        type=int,
+        default=50,
+        help="Training epochs per fold (default 50; use --epochs 2 --cpu for quick smoke)",
+    )
     p.add_argument("--batch-size", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument(
@@ -57,6 +65,11 @@ def main() -> None:
         "--verbose-fit",
         action="store_true",
         help="Show tqdm epoch/batch bars during each fold's training",
+    )
+    p.add_argument(
+        "--cpu",
+        action="store_true",
+        help="Force CPU (recommended if CUDA reports out of memory)",
     )
     p.add_argument("--output", type=Path, default=None)
     p.add_argument(
@@ -87,6 +100,7 @@ def main() -> None:
         gat_heads=args.gat_heads,
         show_progress=True,
         fit_show_progress=args.verbose_fit,
+        device=torch.device("cpu") if args.cpu else None,
     )
     print("Per-fold metrics:")
     print(fold_df.to_string(index=False))
@@ -114,6 +128,7 @@ def main() -> None:
             hidden_dim=args.hidden_dim,
             num_layers=args.num_layers,
             gat_heads=args.gat_heads,
+            device=torch.device("cpu") if args.cpu else None,
         )
         model.fit(
             full_ds,

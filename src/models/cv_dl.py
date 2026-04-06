@@ -153,7 +153,7 @@ def run_gnn_regressor_cv(
     architecture: str = "gin",
     descriptor_name: Optional[Union[str, Sequence[str]]] = None,
     config: Optional[BaselineCVConfig] = None,
-    epochs: int = 2,
+    epochs: int = 50,
     batch_size: int = 32,
     learning_rate: float = 1e-3,
     weight_decay: float = 0.0,
@@ -162,6 +162,7 @@ def run_gnn_regressor_cv(
     gat_heads: int = 4,
     show_progress: bool = True,
     fit_show_progress: bool = False,
+    device: Optional[torch.device] = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """K-fold CV for :class:`~models.nn.pyg_regressor.PyGMoleculeRegressor`.
 
@@ -169,6 +170,8 @@ def run_gnn_regressor_cv(
     ``descriptor_name`` (optional) broadcasts baseline cached descriptors onto node
     features; see :func:`models.data.graph.graph_regression_from_dataframe`.
     ``fit_show_progress`` enables tqdm inside each fold's ``fit`` (default False).
+    ``epochs`` defaults to 50 for meaningful convergence; use fewer for smoke tests.
+    Pass ``device=torch.device("cpu")`` if CUDA runs out of memory.
     """
     cfg = config or BaselineCVConfig()
     work = prepare_regression_frame(train_df, smiles_col, target_cols)
@@ -208,6 +211,7 @@ def run_gnn_regressor_cv(
             hidden_dim=hidden_dim,
             num_layers=num_layers,
             gat_heads=gat_heads,
+            device=device,
         )
         model.fit(
             train_ds,

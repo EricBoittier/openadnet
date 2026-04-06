@@ -30,7 +30,7 @@ cv:
   cv_seed: 0
 
 model:
-  architecture: gin
+  architecture: mpnn
   hidden_dim: 64
   num_layers: 3
   gat_heads: 4
@@ -38,13 +38,13 @@ model:
   descriptor_name: null
 
 train:
-  epochs: 2
-  batch_size: 32
+  epochs: 50
+  batch_size: 256
   learning_rate: 1.0e-3
   weight_decay: 0.0
 
 run:
-  show_progress: true
+  show_progress: false
   fit_show_progress: false
 
 output:

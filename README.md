@@ -8,6 +8,7 @@ Code and baselines for **PXR (pregnane X receptor) activity** modeling on the Op
 | Sklearn CV grid & caching | [Fingerprint grid](#fingerprint-grid), [CV result cache](#cv-result-cache) |
 | Full baseline leaderboard | [Latest baseline CV](#latest-baseline-cv) |
 | PyG SMILES → graph → regression | [`docs/pyg_gnn.md`](docs/pyg_gnn.md) |
+| Example PyG GNN CV | [PyG GNN (example run)](#pyg-gnn-example-run) |
 | Challenge submission CSV | [`src/submission.py`](src/submission.py), [`scripts/write_submission.py`](scripts/write_submission.py) |
 
 ## Installation
@@ -44,6 +45,16 @@ Descriptors are built for **fp sizes** `512, 1024, 2048, 4096`. **Morgan** finge
 ### CV result cache
 
 Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/baseline_cv_cache.json` keyed by a hash of the training SMILES + target and the CV config. Reruns **skip** pairs already in the cache. Remove the file or change `CV_RESULT_CACHE_SCHEMA` in `baseline.py` to force a full recompute.
+
+### PyG GNN (example run)
+
+Illustrative **GIN** encoder, **100** epochs per fold, **3-fold** CV (script default `--n-splits` unless overridden), other settings default (`scripts/cv_gnn_regressor.py`). Command: `PYTHONPATH=src python scripts/cv_gnn_regressor.py --epochs 100`.
+
+| | mean RMSE | std RMSE | mean MAE | std MAE | mean R² | std R² |
+|--|-----------|----------|----------|---------|---------|--------|
+| **summary** | 0.8074 | 0.0241 | 0.6061 | 0.0103 | 0.4813 | 0.0156 |
+
+Per-fold CSV: [`outputs/dl_cv_gnn_gin_e100_ns3.csv`](outputs/dl_cv_gnn_gin_e100_ns3.csv). This is **not** directly comparable row-for-row to the sklearn baseline table below (different fold count, model family, and training budget).
 
 ## Latest baseline CV
 
@@ -2533,7 +2544,7 @@ To refresh the leaderboard table **from cached JSON only** (no new CV runs), use
 
 Requires Hugging Face Hub access for the training CSV on first load (cached afterward). Set `HF_TOKEN` for higher rate limits.
 
-Graph- and transformer-based CV (optional `openadnet[dl]`) is wired through `scripts/cv_gnn_regressor.py`, `scripts/cv_hf_regressor.py`, and related drivers under `scripts/`; see [`docs/pyg_gnn.md`](docs/pyg_gnn.md) for the PyG pipeline.
+Graph- and transformer-based CV (optional `openadnet[dl]`) is wired through `scripts/cv_gnn_regressor.py`, `scripts/cv_hf_regressor.py`, and related drivers under `scripts/`; see [`docs/pyg_gnn.md`](docs/pyg_gnn.md) for the PyG pipeline. PyG GNN CV defaults to **50** epochs per fold (`--epochs` to change); use `--cpu` if CUDA runs out of memory.
 
 ### Custom estimators and CV
 
