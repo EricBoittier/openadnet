@@ -32,6 +32,11 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--hidden-dim", type=int, default=64)
     p.add_argument("--num-layers", type=int, default=3)
+    p.add_argument(
+        "--verbose-fit",
+        action="store_true",
+        help="Show tqdm epoch/batch bars during each fold's training",
+    )
     p.add_argument("--output", type=Path, default=None)
     p.add_argument(
         "--save-dir",
@@ -58,6 +63,7 @@ def main() -> None:
         hidden_dim=args.hidden_dim,
         num_layers=args.num_layers,
         show_progress=True,
+        fit_show_progress=args.verbose_fit,
     )
     print("Per-fold metrics:")
     print(fold_df.to_string(index=False))

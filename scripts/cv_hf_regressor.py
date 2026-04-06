@@ -53,6 +53,11 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=2e-5)
     p.add_argument("--max-length", type=int, default=128)
     p.add_argument(
+        "--verbose-fit",
+        action="store_true",
+        help="Show tqdm epoch/batch bars during each fold's training",
+    )
+    p.add_argument(
         "--cpu",
         action="store_true",
         help="Force CPU (recommended if you see CUDA device-side assert errors)",
@@ -89,6 +94,7 @@ def main() -> None:
         learning_rate=args.lr,
         max_length=args.max_length,
         show_progress=True,
+        fit_show_progress=args.verbose_fit,
         device=torch.device("cpu") if args.cpu else None,
     )
     print("Per-fold metrics:")

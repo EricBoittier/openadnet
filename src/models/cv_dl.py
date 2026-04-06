@@ -72,9 +72,14 @@ def run_hf_regressor_cv(
     weight_decay: float = 0.01,
     max_length: Optional[int] = 256,
     show_progress: bool = True,
+    fit_show_progress: bool = False,
     device: Optional[torch.device] = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """K-fold CV for :class:`~models.hf_regression.HuggingFaceRegressor`.
+
+    ``show_progress`` controls the **fold** tqdm bar only. Per-epoch training bars from
+    ``HuggingFaceRegressor.fit`` are off by default; set ``fit_show_progress=True`` to
+    enable them (can be noisy with many folds).
 
     Use ``device=torch.device("cpu")`` or ``OPENADNET_FORCE_CPU=1`` if CUDA raises
     device-side asserts in notebooks.
@@ -123,7 +128,7 @@ def run_hf_regressor_cv(
             learning_rate=learning_rate,
             weight_decay=weight_decay,
             val_dataset=val_ds,
-            show_progress=False,
+            show_progress=fit_show_progress,
         )
         y_pred = model.predict(val_ds, show_progress=False)
         y_true = val_ds.y
@@ -153,8 +158,12 @@ def run_gnn_regressor_cv(
     hidden_dim: int = 64,
     num_layers: int = 3,
     show_progress: bool = True,
+    fit_show_progress: bool = False,
 ) -> tuple[pd.DataFrame, pd.Series]:
-    """K-fold CV for :class:`~models.gnn_regression.GNNRegressor`."""
+    """K-fold CV for :class:`~models.gnn_regression.GNNRegressor`.
+
+    ``fit_show_progress`` enables tqdm inside each fold's ``fit`` (default False).
+    """
     cfg = config or BaselineCVConfig()
     work = prepare_regression_frame(train_df, smiles_col, target_cols)
     n_tasks = len(target_cols)
@@ -190,7 +199,7 @@ def run_gnn_regressor_cv(
             learning_rate=learning_rate,
             weight_decay=weight_decay,
             val_dataset=val_ds,
-            show_progress=False,
+            show_progress=fit_show_progress,
         )
         y_pred = model.predict(val_ds, show_progress=False)
         y_true = val_ds.y
@@ -221,9 +230,13 @@ def run_chemberta_regressor_cv(
     weight_decay: float = 0.01,
     max_length: Optional[int] = 256,
     show_progress: bool = True,
+    fit_show_progress: bool = False,
     device: Optional[torch.device] = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
-    """K-fold CV using :class:`~models.pt.chemberta.ChembertaRegressor` (same loop as HF)."""
+    """K-fold CV using :class:`~models.pt.chemberta.ChembertaRegressor` (same loop as HF).
+
+    Set ``fit_show_progress=True`` for per-epoch tqdm during each fold's ``fit``.
+    """
     from models.pt.chemberta import ChembertaRegressor
 
     cfg = config or BaselineCVConfig()
@@ -263,7 +276,7 @@ def run_chemberta_regressor_cv(
             learning_rate=learning_rate,
             weight_decay=weight_decay,
             val_dataset=val_ds,
-            show_progress=False,
+            show_progress=fit_show_progress,
         )
         y_pred = model.predict(val_ds, show_progress=False)
         y_true = val_ds.y
