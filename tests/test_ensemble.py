@@ -97,5 +97,64 @@ class TestEnsembleRegressor(unittest.TestCase):
         self.assertEqual(h, [[0.1]])
 
 
+class _FakeQR:
+    def __init__(self, n_tasks: int, fill: np.ndarray) -> None:
+        self.n_tasks = n_tasks
+        self._fill = np.asarray(fill, dtype=np.float64)
+
+    def predict_quantiles(self, dataset, **kwargs):  # noqa: ANN001
+        n = len(dataset)
+        q = self._fill
+        return np.broadcast_to(q, (n, self.n_tasks, q.shape[-1])).copy()
+
+
+class TestEnsembleQuantileRegressor(unittest.TestCase):
+    def test_weighted_quantiles(self) -> None:
+        from models.ensemble import EnsembleQuantileRegressor
+
+        class _DS:
+            y = np.array([[1.0], [3.0]])
+
+            def __len__(self) -> int:
+                return 2
+
+        ds = _DS()
+        # per-member (n_tasks=1, n_q=3): low, median, high
+        a = np.array([[[0.0, 1.0, 2.0]]])  # shape (1,1,3) broadcast to n=2
+        b = np.array([[[4.0, 5.0, 6.0]]])
+        e = EnsembleQuantileRegressor(
+            [_FakeQR(1, a), _FakeQR(1, b)],
+            quantile_levels=[0.1, 0.5, 0.9],
+            weights=[0.25, 0.75],
+        )
+        p = e.predict_quantiles(ds)
+        self.assertEqual(p.shape, (2, 1, 3))
+        want = 0.25 * np.array([0.0, 1.0, 2.0]) + 0.75 * np.array([4.0, 5.0, 6.0])
+        self.assertTrue(np.allclose(p[0, 0], want))
+        self.assertTrue(np.allclose(e.predict(ds), p[:, :, 1]))
+
+    def test_predict_requires_median(self) -> None:
+        from models.ensemble import EnsembleQuantileRegressor
+
+        class _DS:
+            def __len__(self) -> int:
+                return 1
+
+        e = EnsembleQuantileRegressor(
+            [_FakeQR(1, np.ones((1, 1, 2)))],
+            quantile_levels=[0.1, 0.9],
+        )
+        with self.assertRaises(ValueError):
+            e.predict(_DS())
+
+    def test_pinball_loss_helper(self) -> None:
+        from models.ensemble import pinball_loss
+
+        y = np.array([0.0, 2.0])
+        p = np.array([1.0, 1.0])
+        # At q=0.5, pinball equals 0.5 * MAE
+        self.assertAlmostEqual(pinball_loss(y, p, 0.5), 0.5)
+
+
 if __name__ == "__main__":
     unittest.main()
