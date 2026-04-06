@@ -5,10 +5,14 @@ Requires optional dependencies: ``pip install openadnet[dl]``.
 
 from typing import TYPE_CHECKING, Any
 
-__all__ = ["HuggingFaceRegressor", "GNNRegressor", "PyGMoleculeRegressor"]
+__all__ = ["EnsembleRegressor", "HuggingFaceRegressor", "GNNRegressor", "PyGMoleculeRegressor"]
 
 
 def __getattr__(name: str) -> Any:
+    if name == "EnsembleRegressor":
+        from models.ensemble import EnsembleRegressor
+
+        return EnsembleRegressor
     if name == "HuggingFaceRegressor":
         from models.hf_regression import HuggingFaceRegressor
 
@@ -25,6 +29,7 @@ def __getattr__(name: str) -> Any:
 
 
 if TYPE_CHECKING:
+    from models.ensemble import EnsembleRegressor as EnsembleRegressor
     from models.hf_regression import HuggingFaceRegressor as HuggingFaceRegressor
     from models.gnn_regression import GNNRegressor as GNNRegressor
     from models.nn.pyg_regressor import PyGMoleculeRegressor as PyGMoleculeRegressor
