@@ -94,9 +94,10 @@ class TestGraphDatasetDescriptor(unittest.TestCase):
             descriptor_name=desc,
             hidden_dim=16,
             num_layers=2,
+            device=torch.device("cpu"),
         )
         batch = Batch.from_data_list([ds[0]])
-        batch = batch.to(torch.device("cpu"))
+        batch = batch.to(model.device)
         out = model.model(batch)
         self.assertEqual(out.shape, (1, 1))
 

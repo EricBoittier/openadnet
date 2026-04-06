@@ -178,10 +178,9 @@ class HuggingFaceRegressor:
         losses: List[float] = []
         epoch_bar = tqdm(range(epochs), disable=not show_progress, desc="epoch")
         for _ in epoch_bar:
-            batch_bar = tqdm(loader, disable=not show_progress, leave=False, desc="train")
             epoch_loss = 0.0
             n_batches = 0
-            for batch in batch_bar:
+            for batch in loader:
                 batch = self._batch_to_device(batch)
                 opt.zero_grad()
                 out = self.model(**batch)

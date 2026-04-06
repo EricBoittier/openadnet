@@ -115,7 +115,7 @@ def _append_extra_node_features(
             )
     else:
         raise ValueError("extra_node_feat must be 1D or 2D")
-    ext = torch.from_numpy(ex).to(dtype=torch.float32)
+    ext = torch.from_numpy(np.ascontiguousarray(ex)).to(dtype=torch.float32)
     return torch.cat([x, ext], dim=1)
 
 

@@ -116,8 +116,33 @@ sequenceDiagram
 ```
 
 - Implementation: [`run_gnn_regressor_cv`](../src/models/cv_dl.py#L148) in [`cv_dl.py`](../src/models/cv_dl.py)  
-- CLI example: [`scripts/cv_gnn_regressor.py`](../scripts/cv_gnn_regressor.py)  
-- Quick subset example: [`examples/quick_cv_gnn_subset.py`](../examples/quick_cv_gnn_subset.py)
+- CLI example: [`scripts/cv_gnn_regressor.py`](../scripts/cv_gnn_regressor.py) (`--descriptor-name` for fused features)  
+- Quick subset example: [`examples/quick_cv_gnn_subset.py`](../examples/quick_cv_gnn_subset.py) (`--descriptor-name`)
+
+**Notebook-style CV with extra node features** — add **`descriptor_name`** (same keys as `features_data.list_descriptor_names()`):
+
+```python
+from models.cv_dl import run_gnn_regressor_cv
+
+fold_df, summary = run_gnn_regressor_cv(
+    train,
+    smiles_col="SMILES",
+    target_cols=["pEC50"],
+    architecture="mpnn",
+    descriptor_name="morgan_r2_bits_512",
+    config=cfg,
+    epochs=100,
+    batch_size=32,
+    learning_rate=1e-3,
+    hidden_dim=64,
+    num_layers=2,
+    gat_heads=4,
+    show_progress=True,
+    fit_show_progress=False,
+)
+```
+
+See § [Molecule-level descriptors as node features](#molecule-level-descriptors-as-node-features) below.
 
 ---
 
@@ -145,7 +170,8 @@ Large fingerprints (e.g. 4096 bits) on every node increase memory; prefer **`mor
 ## Tests
 
 - Encoder smoke tests: [`tests/test_pyg_architectures.py`](../tests/test_pyg_architectures.py)  
-- Dataset / `GNNRegressor` smoke: [`tests/test_dl_smoke.py`](../tests/test_dl_smoke.py)
+- Dataset / `GNNRegressor` smoke: [`tests/test_dl_smoke.py`](../tests/test_dl_smoke.py)  
+- Descriptor fusion: [`tests/test_graph_descriptors.py`](../tests/test_graph_descriptors.py)
 
 ---
 
