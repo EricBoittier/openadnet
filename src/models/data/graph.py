@@ -22,9 +22,17 @@ _HYB_DIM = len(tuple(HybridizationType.values))  # includes UNSPECIFIED
 # 11 + 6 + 11 + 1 (aromatic) + hyb
 ATOM_FEATURE_DIM: int = _ATOM_DIM + _DEGREE_DIM + _FORMAL_CHARGE_DIM + 1 + _HYB_DIM
 
+# Bond: type one-hot (6) + conjugated + in_ring
+_BOND_TYPE_DIM = 6
+EDGE_FEATURE_DIM: int = _BOND_TYPE_DIM + 2
+
 
 def atom_feature_dim_default() -> int:
     return ATOM_FEATURE_DIM
+
+
+def edge_feature_dim_default() -> int:
+    return EDGE_FEATURE_DIM
 
 
 def _one_hot(idx: int, dim: int) -> List[float]:
@@ -46,6 +54,28 @@ def _hybrid_index(h: Chem.rdchem.HybridizationType) -> int:
         return vals.index(h)
     except ValueError:
         return vals.index(HybridizationType.UNSPECIFIED)  # type: ignore[arg-type]
+
+
+def _bond_type_index(bond: Chem.Bond) -> int:
+    t = bond.GetBondType()
+    order = (
+        Chem.rdchem.BondType.SINGLE,
+        Chem.rdchem.BondType.DOUBLE,
+        Chem.rdchem.BondType.TRIPLE,
+        Chem.rdchem.BondType.AROMATIC,
+        Chem.rdchem.BondType.DATIVE,
+    )
+    try:
+        return order.index(t)
+    except ValueError:
+        return _BOND_TYPE_DIM - 1
+
+
+def _bond_features(bond: Chem.Bond) -> List[float]:
+    feat = _one_hot(_bond_type_index(bond), _BOND_TYPE_DIM)
+    feat.append(1.0 if bond.GetIsConjugated() else 0.0)
+    feat.append(1.0 if bond.IsInRing() else 0.0)
+    return feat
 
 
 def _atom_features(atom: Chem.Atom) -> List[float]:
@@ -73,16 +103,21 @@ def mol_to_pyg_data(mol: Chem.Mol, y: Optional[np.ndarray] = None) -> Data:
 
     edge_src: List[int] = []
     edge_dst: List[int] = []
+    edge_feats: List[List[float]] = []
     for bond in mol.GetBonds():
         a, b = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+        bf = _bond_features(bond)
         edge_src += [a, b]
         edge_dst += [b, a]
+        edge_feats += [bf, bf]
     if not edge_src:
         edge_index = torch.zeros((2, 0), dtype=torch.long)
+        edge_attr = torch.zeros((0, EDGE_FEATURE_DIM), dtype=torch.float32)
     else:
         edge_index = torch.tensor([edge_src, edge_dst], dtype=torch.long)
+        edge_attr = torch.tensor(edge_feats, dtype=torch.float32)
 
-    data = Data(x=x, edge_index=edge_index)
+    data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
     if y is not None:
         # Shape (1, n_tasks) so PyG ``Batch`` stacks to (batch_size, n_tasks).
         yy = torch.tensor(np.asarray(y), dtype=torch.float32).reshape(1, -1)

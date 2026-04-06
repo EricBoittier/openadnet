@@ -13,7 +13,7 @@ from tqdm.auto import tqdm
 
 from baseline import BaselineCVConfig
 from models.data import graph_regression_from_dataframe, smiles_regression_from_dataframe
-from models.gnn_regression import GNNRegressor
+from models.nn.pyg_regressor import PyGMoleculeRegressor
 from models.hf_regression import HuggingFaceRegressor
 
 
@@ -150,6 +150,7 @@ def run_gnn_regressor_cv(
     smiles_col: str,
     target_cols: list[str],
     *,
+    architecture: str = "gin",
     config: Optional[BaselineCVConfig] = None,
     epochs: int = 2,
     batch_size: int = 32,
@@ -157,11 +158,13 @@ def run_gnn_regressor_cv(
     weight_decay: float = 0.0,
     hidden_dim: int = 64,
     num_layers: int = 3,
+    gat_heads: int = 4,
     show_progress: bool = True,
     fit_show_progress: bool = False,
 ) -> tuple[pd.DataFrame, pd.Series]:
-    """K-fold CV for :class:`~models.gnn_regression.GNNRegressor`.
+    """K-fold CV for :class:`~models.nn.pyg_regressor.PyGMoleculeRegressor`.
 
+    ``architecture`` selects the PyG encoder (e.g. ``"gin"``, ``"gcn"``, ``"mpnn"``).
     ``fit_show_progress`` enables tqdm inside each fold's ``fit`` (default False).
     """
     cfg = config or BaselineCVConfig()
@@ -187,10 +190,12 @@ def run_gnn_regressor_cv(
             train_part, smiles_col, target_cols
         )
         val_ds = graph_regression_from_dataframe(val_part, smiles_col, target_cols)
-        model = GNNRegressor(
+        model = PyGMoleculeRegressor(
             n_tasks=n_tasks,
+            architecture=architecture,
             hidden_dim=hidden_dim,
             num_layers=num_layers,
+            gat_heads=gat_heads,
         )
         model.fit(
             train_ds,

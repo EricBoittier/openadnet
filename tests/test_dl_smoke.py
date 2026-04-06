@@ -50,8 +50,11 @@ class TestDlDataGraph(unittest.TestCase):
     def test_smiles_to_pyg(self) -> None:
         from models.data.graph import ATOM_FEATURE_DIM, smiles_to_pyg_data
 
+        from models.data.graph import EDGE_FEATURE_DIM
+
         d = smiles_to_pyg_data("CCO", y=[0.5, 1.5])
         self.assertEqual(d.x.shape[1], ATOM_FEATURE_DIM)
+        self.assertEqual(d.edge_attr.shape[1], EDGE_FEATURE_DIM)
         self.assertEqual(d.y.shape, (1, 2))
 
 

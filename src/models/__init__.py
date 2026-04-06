@@ -5,7 +5,7 @@ Requires optional dependencies: ``pip install openadnet[dl]``.
 
 from typing import TYPE_CHECKING, Any
 
-__all__ = ["HuggingFaceRegressor", "GNNRegressor"]
+__all__ = ["HuggingFaceRegressor", "GNNRegressor", "PyGMoleculeRegressor"]
 
 
 def __getattr__(name: str) -> Any:
@@ -17,9 +17,14 @@ def __getattr__(name: str) -> Any:
         from models.gnn_regression import GNNRegressor
 
         return GNNRegressor
+    if name == "PyGMoleculeRegressor":
+        from models.nn.pyg_regressor import PyGMoleculeRegressor
+
+        return PyGMoleculeRegressor
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 if TYPE_CHECKING:
     from models.hf_regression import HuggingFaceRegressor as HuggingFaceRegressor
     from models.gnn_regression import GNNRegressor as GNNRegressor
+    from models.nn.pyg_regressor import PyGMoleculeRegressor as PyGMoleculeRegressor

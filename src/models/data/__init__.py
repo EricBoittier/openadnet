@@ -2,8 +2,10 @@
 
 from models.data.graph import (
     ATOM_FEATURE_DIM,
+    EDGE_FEATURE_DIM,
     GraphRegressionDataset,
     atom_feature_dim_default,
+    edge_feature_dim_default,
     graph_regression_from_dataframe,
     mol_to_pyg_data,
     smiles_to_pyg_data,
@@ -23,6 +25,7 @@ __all__ = [
     "SmilesRegressionDataset",
     "TargetScaler",
     "atom_feature_dim_default",
+    "edge_feature_dim_default",
     "graph_regression_from_dataframe",
     "mol_to_pyg_data",
     "smiles_regression_collate_fn",

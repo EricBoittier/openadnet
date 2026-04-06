@@ -6,8 +6,9 @@ Run from repo root::
 
     PYTHONPATH=src python examples/holdout_regression.py --backend hf
     PYTHONPATH=src python examples/holdout_regression.py --backend gnn
+    PYTHONPATH=src python examples/holdout_regression.py --backend gnn --gnn-architecture mpnn
 
-Requires: ``pip install openadnet[dl]``. For ``--backend hf``, Hub access for the model.
+    Requires: ``pip install openadnet[dl]``. For ``--backend hf``, Hub access for the model.
 """
 
 from __future__ import annotations
@@ -19,13 +20,28 @@ from models.cv_dl import prepare_regression_frame, regression_metrics
 from models.data import graph_regression_from_dataframe, smiles_regression_from_dataframe
 from models.data.graph import train_val_split_graph
 from models.data.transformer import train_val_split_smiles
-from models.gnn_regression import GNNRegressor
 from models.hf_regression import HuggingFaceRegressor
+from models.nn.pyg_regressor import PyGMoleculeRegressor
+from models.nn.registry import ARCHITECTURES
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--backend", choices=("hf", "gnn"), default="hf")
+    p.add_argument(
+        "--gnn-architecture",
+        choices=list(ARCHITECTURES),
+        default="gin",
+        help="PyG encoder when --backend gnn",
+    )
+    p.add_argument(
+        "--gat-heads",
+        type=int,
+        default=4,
+        help="Attention heads for gat / attentivefp when --backend gnn",
+    )
+    p.add_argument("--hidden-dim", type=int, default=64, help="When --backend gnn")
+    p.add_argument("--num-layers", type=int, default=3, help="When --backend gnn")
     p.add_argument("--val-fraction", type=float, default=0.15)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--max-rows", type=int, default=0, help="If >0, use only first N rows")
@@ -61,7 +77,13 @@ def main() -> None:
         tr_ds, va_ds = train_val_split_graph(
             full_ds, val_fraction=args.val_fraction, random_state=args.seed
         )
-        model = GNNRegressor(n_tasks=1, hidden_dim=64, num_layers=3)
+        model = PyGMoleculeRegressor(
+            n_tasks=1,
+            architecture=args.gnn_architecture,
+            hidden_dim=args.hidden_dim,
+            num_layers=args.num_layers,
+            gat_heads=args.gat_heads,
+        )
         model.fit(
             tr_ds,
             epochs=args.epochs,
