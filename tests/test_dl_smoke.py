@@ -57,6 +57,17 @@ class TestDlDataGraph(unittest.TestCase):
         self.assertEqual(d.edge_attr.shape[1], EDGE_FEATURE_DIM)
         self.assertEqual(d.y.shape, (1, 2))
 
+    def test_graph_dataset_y_property(self) -> None:
+        import numpy as np
+
+        from models.data.graph import GraphRegressionDataset, train_val_split_graph
+
+        ds = GraphRegressionDataset(["CCO", "CCN"], np.array([[1.0], [2.0]]))
+        self.assertTrue(np.allclose(ds.y, [[1.0], [2.0]]))
+        tr, va = train_val_split_graph(ds, val_fraction=0.5, random_state=0)
+        self.assertEqual(tr.y.shape[0], len(tr))
+        self.assertEqual(va.y.shape[0], len(va))
+
 
 @unittest.skipUnless(_have_dl(), "requires openadnet[dl]")
 class TestGNNRegressor(unittest.TestCase):

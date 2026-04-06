@@ -179,6 +179,12 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
     def row_indices(self) -> List[int]:
         return list(self._indices)
 
+    @property
+    def y(self) -> np.ndarray:
+        """Targets for samples in this dataset (same order as ``__getitem__`` / iteration)."""
+        idx = np.asarray(self._indices, dtype=np.intp)
+        return np.asarray(self._y[idx], dtype=np.float64)
+
 
 def graph_regression_from_dataframe(
     df: pd.DataFrame,
