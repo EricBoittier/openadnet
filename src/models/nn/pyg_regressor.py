@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import torch
@@ -15,9 +15,20 @@ from models.data.graph import (
     GraphRegressionDataset,
     atom_feature_dim_default,
     atom_feature_dim_with_descriptor,
+    coerce_graph_descriptor_names,
     edge_feature_dim_default,
 )
 from models.nn.registry import create_pyg_module
+
+
+def _descriptor_tuple_key(
+    dn: Optional[Union[str, Tuple[str, ...]]],
+) -> Optional[Tuple[str, ...]]:
+    if dn is None:
+        return None
+    if isinstance(dn, str):
+        return (dn,)
+    return tuple(dn)
 
 
 class PyGMoleculeRegressor:
@@ -29,7 +40,7 @@ class PyGMoleculeRegressor:
         *,
         architecture: str = "gin",
         in_dim: Optional[int] = None,
-        descriptor_name: Optional[str] = None,
+        descriptor_name: Optional[Union[str, Sequence[str]]] = None,
         edge_dim: Optional[int] = None,
         hidden_dim: int = 64,
         num_layers: int = 3,
@@ -40,11 +51,11 @@ class PyGMoleculeRegressor:
             raise ValueError("n_tasks must be >= 1")
         self.n_tasks = n_tasks
         self.architecture = architecture.lower()
-        self.descriptor_name = descriptor_name
+        self._descriptor_names = coerce_graph_descriptor_names(descriptor_name)
         if in_dim is not None:
             self.in_dim = in_dim
-        elif descriptor_name is not None:
-            self.in_dim = atom_feature_dim_with_descriptor(descriptor_name)
+        elif self._descriptor_names is not None:
+            self.in_dim = atom_feature_dim_with_descriptor(self._descriptor_names)
         else:
             self.in_dim = atom_feature_dim_default()
         self.edge_dim = edge_dim if edge_dim is not None else edge_feature_dim_default()
@@ -64,16 +75,20 @@ class PyGMoleculeRegressor:
             gat_heads=gat_heads,
         ).to(self.device)
 
+    @property
+    def descriptor_name(self) -> Optional[Union[str, Tuple[str, ...]]]:
+        if self._descriptor_names is None:
+            return None
+        if len(self._descriptor_names) == 1:
+            return self._descriptor_names[0]
+        return self._descriptor_names
+
     def _assert_dataset_descriptor(self, dataset: GraphRegressionDataset) -> None:
         ds_dn = getattr(dataset, "descriptor_name", None)
-        if self.descriptor_name is not None:
-            if ds_dn != self.descriptor_name:
-                raise ValueError(
-                    f"dataset descriptor_name={ds_dn!r} does not match model {self.descriptor_name!r}"
-                )
-        elif ds_dn is not None:
+        if _descriptor_tuple_key(ds_dn) != self._descriptor_names:
             raise ValueError(
-                "dataset uses descriptor_name=...; pass the same descriptor_name=... to PyGMoleculeRegressor"
+                f"dataset descriptor_name={ds_dn!r} does not match model "
+                f"{self.descriptor_name!r}"
             )
 
     def fit(
@@ -168,6 +183,12 @@ class PyGMoleculeRegressor:
     def save_pretrained(self, save_directory: Union[str, Path]) -> None:
         path = Path(save_directory)
         path.mkdir(parents=True, exist_ok=True)
+        if self._descriptor_names is None:
+            saved_dn = None
+        elif len(self._descriptor_names) == 1:
+            saved_dn = self._descriptor_names[0]
+        else:
+            saved_dn = list(self._descriptor_names)
         torch.save(
             {
                 "state_dict": self.model.state_dict(),
@@ -178,7 +199,7 @@ class PyGMoleculeRegressor:
                 "hidden_dim": self.hidden_dim,
                 "num_layers": self.num_layers,
                 "gat_heads": self.gat_heads,
-                "descriptor_name": self.descriptor_name,
+                "descriptor_name": saved_dn,
             },
             path / "gnn_regression.pt",
         )
@@ -193,8 +214,8 @@ class PyGMoleculeRegressor:
         self.hidden_dim = int(ckpt["hidden_dim"])
         self.num_layers = int(ckpt["num_layers"])
         self.gat_heads = int(ckpt.get("gat_heads", 4))
-        dn = ckpt.get("descriptor_name")
-        self.descriptor_name = dn if dn is None else str(dn)
+        raw_dn = ckpt.get("descriptor_name")
+        self._descriptor_names = coerce_graph_descriptor_names(raw_dn)
         self.model = create_pyg_module(
             self.architecture,
             in_dim=self.in_dim,

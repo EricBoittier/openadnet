@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Sequence, Union
 
 import torch
 
@@ -22,7 +22,7 @@ class GNNRegressor(PyGMoleculeRegressor):
         n_tasks: int,
         *,
         in_dim: Optional[int] = None,
-        descriptor_name: Optional[str] = None,
+        descriptor_name: Optional[Union[str, Sequence[str]]] = None,
         hidden_dim: int = 64,
         num_layers: int = 3,
         device: Optional[torch.device] = None,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from typing import Sequence
 from functools import lru_cache
 from pathlib import Path
 
@@ -304,6 +305,11 @@ def descriptor_dim(name: str) -> int:
     if canon not in FP_REGISTRY:
         raise KeyError(f"Unknown descriptor: {name!r}")
     return int(FP_REGISTRY[canon]["fp_size"])
+
+
+def descriptor_dim_total(names: Sequence[str]) -> int:
+    """Sum of :func:`descriptor_dim` for each name (concatenated descriptor width)."""
+    return sum(descriptor_dim(n) for n in names)
 
 
 # Legacy name for single constant (used in tests / imports)

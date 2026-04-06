@@ -8,7 +8,7 @@ Writes ``outputs/baseline_cv_results.csv``, ``outputs/baseline_cv_results.html``
 and updates the HTML table in ``README.md`` between marker comments.
 
 Evaluates all fingerprint sizes (512–4096), Morgan radii 0–3, binary + count
-fingerprints, and ``rdkit_phys_props`` (57 descriptor sets × 5 models by default). Uses
+fingerprints, and ``rdkit_phys_props`` (57 descriptor sets × 6 models by default). Uses
 ``outputs/baseline_cv_cache.json`` to skip CV runs already completed for the
 same training data and settings.
 """

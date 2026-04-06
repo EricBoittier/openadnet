@@ -18,10 +18,14 @@ def _have_dl() -> bool:
 
 class TestDescriptorDim(unittest.TestCase):
     def test_dims(self) -> None:
-        from features_data import descriptor_dim
+        from features_data import descriptor_dim, descriptor_dim_total
 
         self.assertEqual(descriptor_dim("morgan_r2_bits_512"), 512)
         self.assertGreater(descriptor_dim("rdkit_phys_props"), 0)
+        self.assertEqual(
+            descriptor_dim_total(["morgan_r2_bits_512", "morgan_r2_bits_512"]),
+            512 + 512,
+        )
 
 
 @unittest.skipUnless(_have_dl(), "requires openadnet[dl]")
@@ -92,6 +96,43 @@ class TestGraphDatasetDescriptor(unittest.TestCase):
             n_tasks=1,
             architecture="gin",
             descriptor_name=desc,
+            hidden_dim=16,
+            num_layers=2,
+            device=torch.device("cpu"),
+        )
+        batch = Batch.from_data_list([ds[0]])
+        batch = batch.to(model.device)
+        out = model.model(batch)
+        self.assertEqual(out.shape, (1, 1))
+
+    def test_multi_descriptor_concat(self) -> None:
+        import pandas as pd
+        import torch
+        from torch_geometric.data import Batch
+
+        from features_data import descriptor_dim_total
+        from models.data import graph_regression_from_dataframe
+        from models.nn.pyg_regressor import PyGMoleculeRegressor
+
+        df = pd.DataFrame(
+            {
+                "smiles": ["CCO", "CCN", "CCC"],
+                "t": [1.0, 2.0, 3.0],
+            }
+        )
+        descs = ["morgan_r2_bits_512", "morgan_r2_bits_512"]
+        ds = graph_regression_from_dataframe(
+            df, "smiles", ["t"], descriptor_name=descs
+        )
+        self.assertEqual(ds.descriptor_name, tuple(descs))
+        d0 = ds[0]
+        extra_w = descriptor_dim_total(descs)
+        self.assertGreater(d0.x.shape[1], extra_w)
+
+        model = PyGMoleculeRegressor(
+            n_tasks=1,
+            architecture="gin",
+            descriptor_name=descs,
             hidden_dim=16,
             num_layers=2,
             device=torch.device("cpu"),

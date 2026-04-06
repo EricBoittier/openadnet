@@ -7,6 +7,7 @@ from itertools import product
 from pathlib import Path
 from typing import Any
 
+import lightgbm as lgbm
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
@@ -174,6 +175,12 @@ def default_regressors(random_state: int = 0) -> dict[str, Any]:
         "hgb": HistGradientBoostingRegressor(
             max_iter=200, random_state=random_state
         ),
+        "lgbm": lgbm.LGBMRegressor(
+            n_estimators=200,
+            random_state=random_state,
+            n_jobs=-1,
+            verbose=-1,
+        ),
         "svr": SVR(kernel="rbf", C=1.0),
     }
 
@@ -203,7 +210,8 @@ def run_baseline_cv(
 
     If ``use_cv_cache`` and ``cv_cache_path`` (default: ``outputs/baseline_cv_cache.json``)
     are set, reuse stored metrics for the same training set hash and cache key; only
-    missing pairs run ``cross_validate``.
+    missing pairs run ``cross_validate``. The cache file is updated after each newly
+    computed pair so interrupts still leave prior pairs reusable on the next run.
 
     Set ``show_progress=False`` to disable the tqdm progress bar (e.g. in tests).
     """
@@ -282,9 +290,8 @@ def run_baseline_cv(
         }
         rows.append(row)
         cache_data["entries"][ck] = row
-
-    if use_cv_cache and n_run:
-        _save_cv_cache(cache_file, cache_data)
+        if use_cv_cache:
+            _save_cv_cache(cache_file, cache_data)
 
     if use_cv_cache and (n_hit or n_run):
         print(
@@ -397,9 +404,8 @@ def run_baseline_cqr_cv(
         }
         rows.append(row)
         cache_data["entries"][ck] = row
-
-    if use_cv_cache and n_run:
-        _save_cv_cache(cache_file, cache_data)
+        if use_cv_cache:
+            _save_cv_cache(cache_file, cache_data)
 
     if use_cv_cache and (n_hit or n_run):
         print(

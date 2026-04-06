@@ -21,6 +21,7 @@ dependencies = [
     "umap-learn",
     "better-tables>=1.0.2",
     "tqdm",
+    "lightgbm",
 ]
 
 [project.optional-dependencies]

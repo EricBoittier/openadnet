@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
@@ -151,7 +151,7 @@ def run_gnn_regressor_cv(
     target_cols: list[str],
     *,
     architecture: str = "gin",
-    descriptor_name: Optional[str] = None,
+    descriptor_name: Optional[Union[str, Sequence[str]]] = None,
     config: Optional[BaselineCVConfig] = None,
     epochs: int = 2,
     batch_size: int = 32,

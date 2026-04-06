@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ from rdkit.Chem import HybridizationType
 from sklearn.model_selection import train_test_split
 from torch_geometric.data import Data
 
-from features_data import build_descriptor_matrix, descriptor_dim
+from features_data import build_descriptor_matrix, descriptor_dim, descriptor_dim_total
 
 # One-hot atom types (common in medchem + H)
 _ATOM_ORDER = ["C", "H", "N", "O", "F", "P", "S", "Cl", "Br", "I", "other"]
@@ -37,9 +37,25 @@ def edge_feature_dim_default() -> int:
     return EDGE_FEATURE_DIM
 
 
-def atom_feature_dim_with_descriptor(descriptor_name: str) -> int:
+def coerce_graph_descriptor_names(
+    descriptor_name: Optional[Union[str, Sequence[str]]],
+) -> Optional[Tuple[str, ...]]:
+    """Normalize to a non-empty tuple of names, or ``None`` if no descriptors."""
+    if descriptor_name is None:
+        return None
+    if isinstance(descriptor_name, str):
+        return (descriptor_name,)
+    t = tuple(str(x) for x in descriptor_name)
+    if not t:
+        raise ValueError("descriptor_name sequence must be non-empty")
+    return t
+
+
+def atom_feature_dim_with_descriptor(descriptor_name: Union[str, Sequence[str]]) -> int:
     """Atom feature size when molecule-level descriptor rows are broadcast to each node."""
-    return ATOM_FEATURE_DIM + descriptor_dim(descriptor_name)
+    names = coerce_graph_descriptor_names(descriptor_name)
+    assert names is not None
+    return ATOM_FEATURE_DIM + descriptor_dim_total(names)
 
 
 def _one_hot(idx: int, dim: int) -> List[float]:
@@ -197,7 +213,7 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
         y: np.ndarray,
         *,
         indices: Optional[Sequence[int]] = None,
-        descriptor_name: Optional[str] = None,
+        descriptor_name: Optional[Union[str, Sequence[str]]] = None,
     ) -> None:
         self._smiles = list(smiles)
         self._y = np.asarray(y, dtype=np.float64)
@@ -209,11 +225,15 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
             self._indices = list(range(len(self._smiles)))
         else:
             self._indices = list(indices)
-        self._descriptor_name = descriptor_name
+        self._descriptor_names = coerce_graph_descriptor_names(descriptor_name)
 
     @property
-    def descriptor_name(self) -> Optional[str]:
-        return self._descriptor_name
+    def descriptor_name(self) -> Optional[Union[str, Tuple[str, ...]]]:
+        if self._descriptor_names is None:
+            return None
+        if len(self._descriptor_names) == 1:
+            return self._descriptor_names[0]
+        return self._descriptor_names
 
     def __len__(self) -> int:
         return len(self._indices)
@@ -222,10 +242,13 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
         i = self._indices[idx]
         s = self._smiles[i]
         row_y = self._y[i]
-        if self._descriptor_name is None:
+        if self._descriptor_names is None:
             return smiles_to_pyg_data(s, y=row_y)
         mol = smiles_to_mol(s)
-        extra = build_descriptor_matrix(self._descriptor_name, [mol])[0]
+        parts = [
+            build_descriptor_matrix(name, [mol])[0] for name in self._descriptor_names
+        ]
+        extra = np.concatenate(parts, axis=0)
         return mol_to_pyg_data(mol, y=row_y, extra_node_feat=extra)
 
     @property
@@ -253,7 +276,7 @@ def graph_regression_from_dataframe(
     target_cols: Sequence[str],
     drop_na_targets: bool = True,
     *,
-    descriptor_name: Optional[str] = None,
+    descriptor_name: Optional[Union[str, Sequence[str]]] = None,
 ) -> GraphRegressionDataset:
     work = df[[smiles_col, *target_cols]].copy()
     if drop_na_targets:
@@ -275,7 +298,10 @@ def graph_regression_from_dataframe(
         raise ValueError("no valid SMILES in dataframe")
     y_arr = np.stack(keep_y, axis=0)
     if descriptor_name is not None:
-        _ = descriptor_dim(descriptor_name)
+        names = coerce_graph_descriptor_names(descriptor_name)
+        assert names is not None
+        for n in names:
+            _ = descriptor_dim(n)
     return GraphRegressionDataset(keep_smiles, y_arr, descriptor_name=descriptor_name)
 
 
@@ -298,7 +324,7 @@ def train_val_split_graph(
     val_rows = [dataset.row_indices[int(i)] for i in val_pos]
     smiles_all = dataset._smiles  # type: ignore[attr-defined]
     y_all = dataset._y  # type: ignore[attr-defined]
-    dn = getattr(dataset, "_descriptor_name", None)
+    dn = getattr(dataset, "_descriptor_names", None)
     train_ds = GraphRegressionDataset(
         smiles_all, y_all, indices=train_rows, descriptor_name=dn
     )
