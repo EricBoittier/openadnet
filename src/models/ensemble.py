@@ -6,6 +6,7 @@ import math
 from typing import Any, List, Optional, Sequence, Tuple
 
 import numpy as np
+from sklearn.base import clone
 
 
 def pinball_loss(
@@ -32,17 +33,103 @@ def _index_quantile(levels: Sequence[float], q: float) -> Optional[int]:
     return None
 
 
+class FingerprintEnsembleMember:
+    """Sklearn fingerprint pipeline aligned to a graph/SMILES dataset by row order.
+
+    Use with :class:`EnsembleRegressor` together with GNN/HF members: pass the same
+    ``GraphRegressionDataset`` (or any dataset with ``.y``) and provide matching
+    ``X_fp`` rows to :meth:`fit` / :meth:`predict`.
+
+    Parameters mirror ``baseline.make_regressor_pipeline(model_name, estimator)``.
+    """
+
+    def __init__(self, model_name: str, estimator: Any, *, n_tasks: int = 1) -> None:
+        if n_tasks < 1:
+            raise ValueError("n_tasks must be >= 1")
+        self.n_tasks = n_tasks
+        self._model_name = model_name
+        self._estimator = estimator
+        self._pipe: Any = None
+
+    def fit(self, dataset: Any, **kwargs: Any) -> List[float]:
+        from baseline import make_regressor_pipeline
+
+        X_fp = kwargs.pop("X_fp", None)
+        if X_fp is None:
+            raise TypeError(
+                "FingerprintEnsembleMember.fit(..., X_fp=) is required "
+                "(one row per dataset sample, same order as dataset.y)"
+            )
+        kwargs.pop("epochs", None)
+        kwargs.pop("batch_size", None)
+        kwargs.pop("show_progress", None)
+        kwargs.pop("val_dataset", None)
+        kwargs.pop("early_stopping_patience", None)
+        kwargs.pop("early_stopping_min_delta", None)
+        kwargs.pop("lr_reduce_factor", None)
+        kwargs.pop("max_lr_reductions", None)
+        kwargs.pop("min_lr", None)
+        kwargs.pop("learning_rate", None)
+        kwargs.pop("weight_decay", None)
+        X_fp = np.asarray(X_fp, dtype=np.float64)
+        y = np.asarray(getattr(dataset, "y"), dtype=np.float64)
+        if y.ndim == 1:
+            y = y.reshape(-1, 1)
+        if X_fp.shape[0] != y.shape[0]:
+            raise ValueError(
+                f"X_fp has {X_fp.shape[0]} rows, dataset.y has {y.shape[0]}"
+            )
+        if y.shape[1] != self.n_tasks:
+            raise ValueError(
+                f"dataset has n_tasks={y.shape[1]}, member expects {self.n_tasks}"
+            )
+        self._pipe = make_regressor_pipeline(self._model_name, clone(self._estimator))
+        if self.n_tasks == 1:
+            self._pipe.fit(X_fp, y.ravel())
+        else:
+            self._pipe.fit(X_fp, y)
+        return []
+
+    def predict(self, dataset: Any, **kwargs: Any) -> np.ndarray:
+        if self._pipe is None:
+            raise RuntimeError("fit must be called before predict")
+        X_fp = kwargs.pop("X_fp", None)
+        if X_fp is None:
+            raise TypeError("FingerprintEnsembleMember.predict(..., X_fp=) is required")
+        kwargs.pop("batch_size", None)
+        kwargs.pop("show_progress", None)
+        X_fp = np.asarray(X_fp, dtype=np.float64)
+        y = np.asarray(getattr(dataset, "y"), dtype=np.float64)
+        if X_fp.shape[0] != len(y):
+            raise ValueError(
+                f"X_fp has {X_fp.shape[0]} rows, dataset has {len(y)} samples"
+            )
+        p = self._pipe.predict(X_fp)
+        p = np.asarray(p, dtype=np.float64)
+        if p.ndim == 1:
+            p = p.reshape(-1, 1)
+        return p
+
+
+def _any_fingerprint_member(models: Sequence[Any]) -> bool:
+    return any(isinstance(m, FingerprintEnsembleMember) for m in models)
+
+
 class EnsembleRegressor:
     """Weighted or uniform average of models that expose ``predict(dataset, **kwargs)``.
 
     All members must share the same ``n_tasks``. Typical members are
-    :class:`~models.gnn_regression.GNNRegressor`,
-    :class:`~models.nn.pyg_regressor.PyGMoleculeRegressor`, or
-    :class:`~models.hf_regression.HuggingFaceRegressor` trained on the same
-    task layout (same ``n_tasks`` and compatible dataset type per model).
+    :class:`~models.gnn_regression.GNNRegressor` (default GAT; set ``architecture=``),
+    :class:`~models.nn.pyg_regressor.PyGMoleculeRegressor`,
+    :class:`~models.hf_regression.HuggingFaceRegressor`, or
+    :class:`FingerprintEnsembleMember` (sklearn tree/GBDT on fingerprints).
+
+    If any member is :class:`FingerprintEnsembleMember`, you must pass
+    ``X_fp`` (feature matrix, same row order as ``dataset``) to :meth:`fit`,
+    :meth:`predict`, and :meth:`evaluate_loss`.
 
     ``predict`` forwards ``**kwargs`` to each member (e.g. ``batch_size``,
-    ``show_progress``).
+    ``show_progress`` for DL models).
     """
 
     def __init__(
@@ -94,7 +181,19 @@ class EnsembleRegressor:
 
         Returns a list of per-model training outputs (typically loss histories).
         Members without ``fit`` raise ``TypeError``.
+
+        When the ensemble includes :class:`FingerprintEnsembleMember`, pass
+        ``X_fp`` aligned with ``train_dataset`` rows.
         """
+        fp_kw: dict[str, Any] = {}
+        if _any_fingerprint_member(self._models):
+            X_fp = kwargs.pop("X_fp", None)
+            if X_fp is None:
+                raise ValueError(
+                    "EnsembleRegressor.fit requires X_fp=... when a "
+                    "FingerprintEnsembleMember is included"
+                )
+            fp_kw["X_fp"] = X_fp
         histories: List[Any] = []
         for m in self._models:
             fit = getattr(m, "fit", None)
@@ -102,12 +201,27 @@ class EnsembleRegressor:
                 raise TypeError(
                     f"{type(m).__name__!r} has no callable fit; train members separately"
                 )
-            histories.append(fit(train_dataset, **kwargs))
+            if isinstance(m, FingerprintEnsembleMember):
+                histories.append(fit(train_dataset, **fp_kw, **kwargs))
+            else:
+                histories.append(fit(train_dataset, **kwargs))
         return histories
 
     def predict(self, dataset: Any, **kwargs: Any) -> np.ndarray:
         """Average predictions; shape ``(n_samples, n_tasks)``."""
-        parts = [m.predict(dataset, **kwargs) for m in self._models]
+        X_fp = kwargs.get("X_fp")
+        if _any_fingerprint_member(self._models) and X_fp is None:
+            raise ValueError(
+                "EnsembleRegressor.predict requires X_fp=... when a "
+                "FingerprintEnsembleMember is included"
+            )
+        parts: List[np.ndarray] = []
+        dl_kw = {k: v for k, v in kwargs.items() if k != "X_fp"}
+        for m in self._models:
+            if isinstance(m, FingerprintEnsembleMember):
+                parts.append(m.predict(dataset, **kwargs))
+            else:
+                parts.append(m.predict(dataset, **dl_kw))
         stacked = np.stack(parts, axis=0)
         w = self._weights.reshape(-1, 1, 1)
         out = np.sum(stacked * w, axis=0)

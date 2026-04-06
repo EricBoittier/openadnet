@@ -35,7 +35,7 @@ flowchart LR
 | Atom/bond features, `edge_attr` | Fixed featurization dim | [`graph.py`](../src/models/data/graph.py) (`ATOM_FEATURE_DIM`, `EDGE_FEATURE_DIM`, `mol_to_pyg_data`) |
 | Dataset + targets | `GraphRegressionDataset`, `.y` property | [`graph.py`](../src/models/data/graph.py) (`GraphRegressionDataset`, `graph_regression_from_dataframe`) |
 | Training loop | MSE, Adam, `model(batch)` | [`pyg_regressor.py`](../src/models/nn/pyg_regressor.py) (`PyGMoleculeRegressor`) |
-| GIN default API | Thin subclass | [`gnn_regression.py`](../src/models/gnn_regression.py) (`GNNRegressor`) |
+| GAT default API | Thin subclass | [`gnn_regression.py`](../src/models/gnn_regression.py) (`GNNRegressor`; pass `architecture=` for other encoders) |
 
 ---
 

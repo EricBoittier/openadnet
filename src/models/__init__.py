@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 __all__ = [
     "EnsembleQuantileRegressor",
     "EnsembleRegressor",
+    "FingerprintEnsembleMember",
     "HuggingFaceRegressor",
     "GNNRegressor",
     "PyGMoleculeRegressor",
@@ -24,6 +25,10 @@ def __getattr__(name: str) -> Any:
         from models.ensemble import EnsembleRegressor
 
         return EnsembleRegressor
+    if name == "FingerprintEnsembleMember":
+        from models.ensemble import FingerprintEnsembleMember
+
+        return FingerprintEnsembleMember
     if name == "pinball_loss":
         from models.ensemble import pinball_loss
 
@@ -47,6 +52,7 @@ if TYPE_CHECKING:
     from models.ensemble import (
         EnsembleQuantileRegressor as EnsembleQuantileRegressor,
         EnsembleRegressor as EnsembleRegressor,
+        FingerprintEnsembleMember as FingerprintEnsembleMember,
         pinball_loss as pinball_loss,
     )
     from models.hf_regression import HuggingFaceRegressor as HuggingFaceRegressor

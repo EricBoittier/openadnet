@@ -12,6 +12,9 @@ class _FakeRegressor:
         self.n_tasks = n_tasks
         self._fill = fill
 
+    def fit(self, dataset, **kwargs):  # noqa: ANN001
+        return []
+
     def predict(self, dataset, **kwargs):  # noqa: ANN001
         n = len(dataset)
         return np.full((n, self.n_tasks), self._fill, dtype=np.float64)
@@ -95,6 +98,66 @@ class TestEnsembleRegressor(unittest.TestCase):
         h = e.fit(_DS())
         self.assertTrue(m.called)
         self.assertEqual(h, [[0.1]])
+
+
+class TestMixedGnnTreeEnsemble(unittest.TestCase):
+    def test_fingerprint_and_graph_member(self) -> None:
+        from sklearn.linear_model import LinearRegression
+
+        from models.ensemble import EnsembleRegressor, FingerprintEnsembleMember
+
+        class _DS:
+            def __init__(self, y: np.ndarray) -> None:
+                self.y = np.asarray(y, dtype=np.float64).reshape(-1, 1)
+
+            def __len__(self) -> int:
+                return len(self.y)
+
+        ds = _DS(np.array([1.0, 3.0]))
+        X_fp = np.ones((2, 1), dtype=np.float64)
+        fp = FingerprintEnsembleMember("hgb", LinearRegression(), n_tasks=1)
+        e = EnsembleRegressor([_FakeRegressor(1, 2.0), fp], weights=[0.5, 0.5])
+        e.fit(ds, X_fp=X_fp)
+        p = e.predict(ds, X_fp=X_fp)
+        self.assertEqual(p.shape, (2, 1))
+        self.assertTrue(np.allclose(p, 2.0))
+
+    def test_mixed_fit_requires_x_fp(self) -> None:
+        from sklearn.linear_model import LinearRegression
+
+        from models.ensemble import EnsembleRegressor, FingerprintEnsembleMember
+
+        class _DS:
+            y = np.zeros((2, 1))
+
+            def __len__(self) -> int:
+                return 2
+
+        e = EnsembleRegressor(
+            [_FakeRegressor(1, 0.0), FingerprintEnsembleMember("hgb", LinearRegression())]
+        )
+        with self.assertRaises(ValueError):
+            e.fit(_DS())
+
+    def test_mixed_predict_requires_x_fp(self) -> None:
+        from sklearn.linear_model import LinearRegression
+
+        from models.ensemble import EnsembleRegressor, FingerprintEnsembleMember
+
+        class _DS:
+            y = np.array([[1.0], [2.0]])
+
+            def __len__(self) -> int:
+                return 2
+
+        ds = _DS()
+        X_fp = np.ones((2, 1))
+        e = EnsembleRegressor(
+            [_FakeRegressor(1, 1.0), FingerprintEnsembleMember("hgb", LinearRegression())]
+        )
+        e.fit(ds, X_fp=X_fp)
+        with self.assertRaises(ValueError):
+            e.predict(ds)
 
 
 class _FakeQR:
