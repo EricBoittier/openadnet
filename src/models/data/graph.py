@@ -12,6 +12,8 @@ from rdkit.Chem import HybridizationType
 from sklearn.model_selection import train_test_split
 from torch_geometric.data import Data
 
+from features_data import build_descriptor_matrix, descriptor_dim
+
 # One-hot atom types (common in medchem + H)
 _ATOM_ORDER = ["C", "H", "N", "O", "F", "P", "S", "Cl", "Br", "I", "other"]
 _ATOM_DIM = len(_ATOM_ORDER)
@@ -33,6 +35,11 @@ def atom_feature_dim_default() -> int:
 
 def edge_feature_dim_default() -> int:
     return EDGE_FEATURE_DIM
+
+
+def atom_feature_dim_with_descriptor(descriptor_name: str) -> int:
+    """Atom feature size when molecule-level descriptor rows are broadcast to each node."""
+    return ATOM_FEATURE_DIM + descriptor_dim(descriptor_name)
 
 
 def _one_hot(idx: int, dim: int) -> List[float]:
@@ -92,14 +99,47 @@ def _atom_features(atom: Chem.Atom) -> List[float]:
     return feat
 
 
-def mol_to_pyg_data(mol: Chem.Mol, y: Optional[np.ndarray] = None) -> Data:
-    """Convert a sanitized RDKit molecule to a single PyG ``Data`` object."""
+def _append_extra_node_features(
+    x: torch.Tensor,
+    extra_node_feat: np.ndarray,
+    n_atoms: int,
+) -> torch.Tensor:
+    """Concatenate ``(D,)`` or ``(n_atoms, D)`` numpy features to node tensor ``x``."""
+    ex = np.asarray(extra_node_feat, dtype=np.float64)
+    if ex.ndim == 1:
+        ex = np.broadcast_to(ex, (n_atoms, ex.shape[0]))
+    elif ex.ndim == 2:
+        if ex.shape[0] != n_atoms:
+            raise ValueError(
+                f"extra_node_feat has {ex.shape[0]} rows, expected {n_atoms} atoms"
+            )
+    else:
+        raise ValueError("extra_node_feat must be 1D or 2D")
+    ext = torch.from_numpy(ex).to(dtype=torch.float32)
+    return torch.cat([x, ext], dim=1)
+
+
+def mol_to_pyg_data(
+    mol: Chem.Mol,
+    y: Optional[np.ndarray] = None,
+    *,
+    extra_node_feat: Optional[np.ndarray] = None,
+) -> Data:
+    """Convert a sanitized RDKit molecule to a single PyG ``Data`` object.
+
+    If ``extra_node_feat`` is set (shape ``(D,)`` broadcast or ``(n_atoms, D)``), it is
+    concatenated to each atom row after the default atom features (same cache as
+    :func:`features_data.build_descriptor_matrix`).
+    """
     if mol.GetNumAtoms() == 0:
         raise ValueError("empty molecule")
     xs: List[List[float]] = []
     for atom in mol.GetAtoms():
         xs.append(_atom_features(atom))
     x = torch.tensor(xs, dtype=torch.float32)
+    n_atoms = x.shape[0]
+    if extra_node_feat is not None:
+        x = _append_extra_node_features(x, extra_node_feat, n_atoms)
 
     edge_src: List[int] = []
     edge_dst: List[int] = []
@@ -125,7 +165,8 @@ def mol_to_pyg_data(mol: Chem.Mol, y: Optional[np.ndarray] = None) -> Data:
     return data
 
 
-def smiles_to_pyg_data(smiles: str, y: Optional[np.ndarray] = None) -> Data:
+def smiles_to_mol(smiles: str) -> Chem.Mol:
+    """Parse SMILES the same way as graph conversion (Hs, sanitize)."""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         raise ValueError(f"invalid SMILES: {smiles!r}")
@@ -134,7 +175,17 @@ def smiles_to_pyg_data(smiles: str, y: Optional[np.ndarray] = None) -> Data:
         Chem.SanitizeMol(mol)
     except Chem.MolSanitizeException as e:
         raise ValueError(f"sanitize failed for SMILES: {smiles!r}") from e
-    return mol_to_pyg_data(mol, y=y)
+    return mol
+
+
+def smiles_to_pyg_data(
+    smiles: str,
+    y: Optional[np.ndarray] = None,
+    *,
+    extra_node_feat: Optional[np.ndarray] = None,
+) -> Data:
+    mol = smiles_to_mol(smiles)
+    return mol_to_pyg_data(mol, y=y, extra_node_feat=extra_node_feat)
 
 
 class GraphRegressionDataset(torch.utils.data.Dataset):
@@ -146,6 +197,7 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
         y: np.ndarray,
         *,
         indices: Optional[Sequence[int]] = None,
+        descriptor_name: Optional[str] = None,
     ) -> None:
         self._smiles = list(smiles)
         self._y = np.asarray(y, dtype=np.float64)
@@ -157,6 +209,11 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
             self._indices = list(range(len(self._smiles)))
         else:
             self._indices = list(indices)
+        self._descriptor_name = descriptor_name
+
+    @property
+    def descriptor_name(self) -> Optional[str]:
+        return self._descriptor_name
 
     def __len__(self) -> int:
         return len(self._indices)
@@ -165,7 +222,11 @@ class GraphRegressionDataset(torch.utils.data.Dataset):
         i = self._indices[idx]
         s = self._smiles[i]
         row_y = self._y[i]
-        return smiles_to_pyg_data(s, y=row_y)
+        if self._descriptor_name is None:
+            return smiles_to_pyg_data(s, y=row_y)
+        mol = smiles_to_mol(s)
+        extra = build_descriptor_matrix(self._descriptor_name, [mol])[0]
+        return mol_to_pyg_data(mol, y=row_y, extra_node_feat=extra)
 
     @property
     def n_tasks(self) -> int:
@@ -191,6 +252,8 @@ def graph_regression_from_dataframe(
     smiles_col: str,
     target_cols: Sequence[str],
     drop_na_targets: bool = True,
+    *,
+    descriptor_name: Optional[str] = None,
 ) -> GraphRegressionDataset:
     work = df[[smiles_col, *target_cols]].copy()
     if drop_na_targets:
@@ -211,7 +274,9 @@ def graph_regression_from_dataframe(
     if not keep_smiles:
         raise ValueError("no valid SMILES in dataframe")
     y_arr = np.stack(keep_y, axis=0)
-    return GraphRegressionDataset(keep_smiles, y_arr)
+    if descriptor_name is not None:
+        _ = descriptor_dim(descriptor_name)
+    return GraphRegressionDataset(keep_smiles, y_arr, descriptor_name=descriptor_name)
 
 
 def train_val_split_graph(
@@ -233,6 +298,11 @@ def train_val_split_graph(
     val_rows = [dataset.row_indices[int(i)] for i in val_pos]
     smiles_all = dataset._smiles  # type: ignore[attr-defined]
     y_all = dataset._y  # type: ignore[attr-defined]
-    train_ds = GraphRegressionDataset(smiles_all, y_all, indices=train_rows)
-    val_ds = GraphRegressionDataset(smiles_all, y_all, indices=val_rows)
+    dn = getattr(dataset, "_descriptor_name", None)
+    train_ds = GraphRegressionDataset(
+        smiles_all, y_all, indices=train_rows, descriptor_name=dn
+    )
+    val_ds = GraphRegressionDataset(
+        smiles_all, y_all, indices=val_rows, descriptor_name=dn
+    )
     return train_ds, val_ds

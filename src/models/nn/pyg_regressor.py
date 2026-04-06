@@ -11,7 +11,12 @@ import torch.nn.functional as F
 from torch_geometric.loader import DataLoader
 from tqdm import tqdm
 
-from models.data.graph import GraphRegressionDataset, atom_feature_dim_default, edge_feature_dim_default
+from models.data.graph import (
+    GraphRegressionDataset,
+    atom_feature_dim_default,
+    atom_feature_dim_with_descriptor,
+    edge_feature_dim_default,
+)
 from models.nn.registry import create_pyg_module
 
 
@@ -24,6 +29,7 @@ class PyGMoleculeRegressor:
         *,
         architecture: str = "gin",
         in_dim: Optional[int] = None,
+        descriptor_name: Optional[str] = None,
         edge_dim: Optional[int] = None,
         hidden_dim: int = 64,
         num_layers: int = 3,
@@ -34,7 +40,13 @@ class PyGMoleculeRegressor:
             raise ValueError("n_tasks must be >= 1")
         self.n_tasks = n_tasks
         self.architecture = architecture.lower()
-        self.in_dim = in_dim if in_dim is not None else atom_feature_dim_default()
+        self.descriptor_name = descriptor_name
+        if in_dim is not None:
+            self.in_dim = in_dim
+        elif descriptor_name is not None:
+            self.in_dim = atom_feature_dim_with_descriptor(descriptor_name)
+        else:
+            self.in_dim = atom_feature_dim_default()
         self.edge_dim = edge_dim if edge_dim is not None else edge_feature_dim_default()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
@@ -52,6 +64,18 @@ class PyGMoleculeRegressor:
             gat_heads=gat_heads,
         ).to(self.device)
 
+    def _assert_dataset_descriptor(self, dataset: GraphRegressionDataset) -> None:
+        ds_dn = getattr(dataset, "descriptor_name", None)
+        if self.descriptor_name is not None:
+            if ds_dn != self.descriptor_name:
+                raise ValueError(
+                    f"dataset descriptor_name={ds_dn!r} does not match model {self.descriptor_name!r}"
+                )
+        elif ds_dn is not None:
+            raise ValueError(
+                "dataset uses descriptor_name=...; pass the same descriptor_name=... to PyGMoleculeRegressor"
+            )
+
     def fit(
         self,
         train_dataset: GraphRegressionDataset,
@@ -67,6 +91,7 @@ class PyGMoleculeRegressor:
             raise ValueError(
                 f"dataset has n_tasks={train_dataset.n_tasks}, model expects {self.n_tasks}"
             )
+        self._assert_dataset_descriptor(train_dataset)
         self.model.train()
         loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         opt = torch.optim.Adam(
@@ -107,6 +132,7 @@ class PyGMoleculeRegressor:
         *,
         batch_size: int = 32,
     ) -> float:
+        self._assert_dataset_descriptor(dataset)
         self.model.eval()
         loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
         total = 0.0
@@ -128,6 +154,7 @@ class PyGMoleculeRegressor:
         batch_size: int = 32,
         show_progress: bool = False,
     ) -> np.ndarray:
+        self._assert_dataset_descriptor(dataset)
         self.model.eval()
         loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
         chunks: List[np.ndarray] = []
@@ -152,6 +179,7 @@ class PyGMoleculeRegressor:
                 "hidden_dim": self.hidden_dim,
                 "num_layers": self.num_layers,
                 "gat_heads": self.gat_heads,
+                "descriptor_name": self.descriptor_name,
             },
             path / "gnn_regression.pt",
         )
@@ -166,6 +194,8 @@ class PyGMoleculeRegressor:
         self.hidden_dim = int(ckpt["hidden_dim"])
         self.num_layers = int(ckpt["num_layers"])
         self.gat_heads = int(ckpt.get("gat_heads", 4))
+        dn = ckpt.get("descriptor_name")
+        self.descriptor_name = dn if dn is None else str(dn)
         self.model = create_pyg_module(
             self.architecture,
             in_dim=self.in_dim,

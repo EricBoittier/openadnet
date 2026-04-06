@@ -296,6 +296,16 @@ def build_descriptor_matrix(name: str, mols: list) -> np.ndarray:
     return build_fingerprint_matrix(name, mols)
 
 
+def descriptor_dim(name: str) -> int:
+    """Number of columns produced by :func:`build_descriptor_matrix` for ``name``."""
+    canon = resolve_descriptor_name(name)
+    if canon == "rdkit_phys_props":
+        return len(_RDKIT_PHYS_FUNCS)
+    if canon not in FP_REGISTRY:
+        raise KeyError(f"Unknown descriptor: {name!r}")
+    return int(FP_REGISTRY[canon]["fp_size"])
+
+
 # Legacy name for single constant (used in tests / imports)
 FP_SIZE = 2048
 FP_GENERATORS = {k: v["gen"] for k, v in FP_REGISTRY.items() if "bits" in k}

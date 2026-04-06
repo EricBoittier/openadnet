@@ -151,6 +151,7 @@ def run_gnn_regressor_cv(
     target_cols: list[str],
     *,
     architecture: str = "gin",
+    descriptor_name: Optional[str] = None,
     config: Optional[BaselineCVConfig] = None,
     epochs: int = 2,
     batch_size: int = 32,
@@ -165,6 +166,8 @@ def run_gnn_regressor_cv(
     """K-fold CV for :class:`~models.nn.pyg_regressor.PyGMoleculeRegressor`.
 
     ``architecture`` selects the PyG encoder (e.g. ``"gin"``, ``"gcn"``, ``"mpnn"``).
+    ``descriptor_name`` (optional) broadcasts baseline cached descriptors onto node
+    features; see :func:`models.data.graph.graph_regression_from_dataframe`.
     ``fit_show_progress`` enables tqdm inside each fold's ``fit`` (default False).
     """
     cfg = config or BaselineCVConfig()
@@ -187,12 +190,21 @@ def run_gnn_regressor_cv(
         train_part = work.iloc[train_idx]
         val_part = work.iloc[val_idx]
         train_ds = graph_regression_from_dataframe(
-            train_part, smiles_col, target_cols
+            train_part,
+            smiles_col,
+            target_cols,
+            descriptor_name=descriptor_name,
         )
-        val_ds = graph_regression_from_dataframe(val_part, smiles_col, target_cols)
+        val_ds = graph_regression_from_dataframe(
+            val_part,
+            smiles_col,
+            target_cols,
+            descriptor_name=descriptor_name,
+        )
         model = PyGMoleculeRegressor(
             n_tasks=n_tasks,
             architecture=architecture,
+            descriptor_name=descriptor_name,
             hidden_dim=hidden_dim,
             num_layers=num_layers,
             gat_heads=gat_heads,
