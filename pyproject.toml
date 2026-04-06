@@ -22,6 +22,7 @@ dependencies = [
     "better-tables>=1.0.2",
     "tqdm",
     "lightgbm",
+    "shap",
 ]
 
 [project.optional-dependencies]
