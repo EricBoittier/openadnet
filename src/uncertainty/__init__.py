@@ -9,6 +9,7 @@ from .plotting import (
     format_uncertainty_metrics_table,
     plot_emax_uncertainty_panel,
     plot_interval_width_comparison,
+    plot_ordered_intervals_lollipop,
     plot_pred_vs_obs_with_intervals,
     uncertainty_comparison_metrics,
 )
@@ -28,6 +29,7 @@ __all__ = [
     "format_uncertainty_metrics_table",
     "plot_emax_uncertainty_panel",
     "plot_interval_width_comparison",
+    "plot_ordered_intervals_lollipop",
     "plot_pred_vs_obs_with_intervals",
     "uncertainty_comparison_metrics",
     "assay_model_width_correlation",

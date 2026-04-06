@@ -62,14 +62,22 @@ def plot_pred_vs_obs_with_intervals(
     ylabel: str = "Predicted pEC50 (median)",
     point_size: float = 14.0,
     point_alpha: float = 0.55,
-    line_alpha: float = 0.35,
+    line_alpha: float = 0.45,
     capsize: float = 1.2,
     identity: bool = True,
+    color_points: str = "#1f77b4",
+    color_model_err: str = "#2ca02c",
+    color_assay_err: str = "#ff7f0e",
+    label_points: str = "Median ŷ",
+    label_model_err: str = "CQR interval (on prediction)",
+    label_assay_err: str = "Assay pEC50 CI (on observation)",
+    label_identity: str = "y = ŷ",
 ) -> Axes:
     """
-    Scatter observed vs predicted with asymmetric error bars for **model** intervals
-    on the prediction (vertical). Optionally add horizontal error bars from **assay**
-    CI on the observed value.
+    Scatter observed vs predicted with asymmetric error bars: **model** (vertical) and optional
+    **assay** (horizontal) use separate colors and legend entries.
+
+    Draw model and assay uncertainties as two ``errorbar`` calls so colors and labels stay distinct.
 
     Error bar convention: model uses ``[lower, upper]`` around ``y_pred``; assay uses
     ``[assay_ci_lower, assay_ci_upper]`` around ``y_obs``.
@@ -96,14 +104,28 @@ def plot_pred_vs_obs_with_intervals(
         ax.errorbar(
             y_obs[m],
             y_pred[m],
-            xerr=xerr[:, m],
             yerr=yerr[:, m],
+            xerr=None,
             fmt="none",
-            ecolor="C0",
-            elinewidth=0.8,
+            color=color_model_err,
+            elinewidth=1.0,
             capsize=capsize,
             alpha=line_alpha,
             zorder=1,
+            label=label_model_err,
+        )
+        ax.errorbar(
+            y_obs[m],
+            y_pred[m],
+            yerr=None,
+            xerr=xerr[:, m],
+            fmt="none",
+            color=color_assay_err,
+            elinewidth=1.0,
+            capsize=capsize,
+            alpha=line_alpha,
+            zorder=1,
+            label=label_assay_err,
         )
     else:
         m = _finite_mask(y_obs, y_pred, lower, upper)
@@ -112,11 +134,12 @@ def plot_pred_vs_obs_with_intervals(
             y_pred[m],
             yerr=yerr[:, m],
             fmt="none",
-            ecolor="C0",
-            elinewidth=0.8,
+            color=color_model_err,
+            elinewidth=1.0,
             capsize=capsize,
             alpha=line_alpha,
             zorder=1,
+            label=label_model_err,
         )
 
     ax.scatter(
@@ -124,10 +147,11 @@ def plot_pred_vs_obs_with_intervals(
         y_pred[m],
         s=point_size,
         alpha=point_alpha,
-        c="C0",
+        c=color_points,
         edgecolors="white",
         linewidths=0.3,
         zorder=2,
+        label=label_points,
     )
 
     if identity:
@@ -140,15 +164,146 @@ def plot_pred_vs_obs_with_intervals(
             "k--",
             lw=1,
             alpha=0.7,
-            label="y = ŷ",
+            label=label_identity,
         )
-        ax.legend(loc="upper left")
 
+    ax.legend(loc="upper left", fontsize=8)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     if title:
         ax.set_title(title)
     ax.set_aspect("equal", adjustable="box")
+    return ax
+
+
+def plot_ordered_intervals_lollipop(
+    y_obs: np.ndarray,
+    y_pred: np.ndarray,
+    lower: np.ndarray,
+    upper: np.ndarray,
+    *,
+    assay_ci_lower: np.ndarray | None = None,
+    assay_ci_upper: np.ndarray | None = None,
+    ax: Axes | None = None,
+    title: str | None = None,
+    xlabel: str = "Samples (sorted by observed pEC50)",
+    ylabel: str = "pEC50",
+    color_obs: str = "#1f77b4",
+    color_pred: str = "#9467bd",
+    color_model_interval: str = "#2ca02c",
+    color_assay_interval: str = "#ff7f0e",
+    label_obs: str = "Observed y",
+    label_pred: str = "Median ŷ",
+    label_model: str = "CQR [lower, upper]",
+    label_assay: str = "Assay CI [lower, upper]",
+    stem_lw: float = 1.1,
+    max_points: int | None = 200,
+    random_state: int | None = 0,
+) -> Axes:
+    """
+    Samples **ordered by** ``y_obs``; x-axis is rank index. **Lollipops**: vertical stems for the
+    CQR interval; optional horizontal caps for assay CI at ``y_obs``. Uses distinct colors and
+    legend entries matching :func:`plot_pred_vs_obs_with_intervals`.
+
+    If ``len(y_obs) > max_points``, a random subset of rows is kept after masking (reproducible with
+    ``random_state``).
+    """
+    y_obs = np.asarray(y_obs, dtype=float).ravel()
+    y_pred = np.asarray(y_pred, dtype=float).ravel()
+    lower = np.asarray(lower, dtype=float).ravel()
+    upper = np.asarray(upper, dtype=float).ravel()
+
+    if assay_ci_lower is not None and assay_ci_upper is not None:
+        acl = np.asarray(assay_ci_lower, dtype=float).ravel()
+        acu = np.asarray(assay_ci_upper, dtype=float).ravel()
+        m = _finite_mask(y_obs, y_pred, lower, upper, acl, acu)
+    else:
+        acl = acu = None
+        m = _finite_mask(y_obs, y_pred, lower, upper)
+
+    yo = y_obs[m]
+    yp = y_pred[m]
+    lo = lower[m]
+    hi = upper[m]
+    n = yo.shape[0]
+    if n == 0:
+        raise ValueError("No finite rows to plot.")
+
+    if max_points is not None and n > max_points:
+        rng = np.random.default_rng(random_state)
+        pick = rng.choice(n, size=max_points, replace=False)
+        yo, yp, lo, hi = yo[pick], yp[pick], lo[pick], hi[pick]
+        if acl is not None:
+            acl = acl[m][pick]
+            acu = acu[m][pick]
+        n = yo.shape[0]
+
+    order = np.argsort(yo)
+    yo, yp, lo, hi = yo[order], yp[order], lo[order], hi[order]
+    if acl is not None:
+        acl = acl[order]
+        acu = acu[order]
+
+    x = np.arange(n, dtype=float)
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=(10, 4.5))
+
+    # CQR interval: vertical stems (same x)
+    ax.vlines(
+        x,
+        lo,
+        hi,
+        colors=color_model_interval,
+        lw=stem_lw,
+        alpha=0.55,
+        zorder=1,
+    )
+    ax.plot([], [], color=color_model_interval, lw=stem_lw + 0.5, label=label_model)
+
+    # Assay CI on y_obs: vertical segment [acl, acu] at a small x-offset
+    if acl is not None and acu is not None:
+        dx = 0.28
+        ax.vlines(
+            x + dx,
+            acl,
+            acu,
+            colors=color_assay_interval,
+            lw=stem_lw,
+            alpha=0.75,
+            zorder=1,
+        )
+        ax.plot([], [], color=color_assay_interval, lw=stem_lw + 0.5, label=label_assay)
+
+    ax.scatter(
+        x,
+        yp,
+        s=28,
+        c=color_pred,
+        edgecolors="white",
+        linewidths=0.35,
+        zorder=4,
+        label=label_pred,
+    )
+    ax.scatter(
+        x,
+        yo,
+        s=22,
+        marker="s",
+        c=color_obs,
+        edgecolors="white",
+        linewidths=0.3,
+        alpha=0.9,
+        zorder=5,
+        label=label_obs,
+    )
+
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    if title:
+        ax.set_title(title)
+    ax.legend(loc="upper left", fontsize=8, ncol=2)
+    ax.margins(x=0.01)
     return ax
 
 
