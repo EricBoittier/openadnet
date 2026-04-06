@@ -24,6 +24,7 @@ def write_baseline_cv_artifacts(
     project_root: Path,
     *,
     csv_name: str = "baseline_cv_results.csv",
+    html_name: str = "baseline_cv_results.html",
     update_readme: bool = True,
 ) -> tuple[Path, Path | None]:
     """
@@ -59,7 +60,7 @@ def write_baseline_cv_artifacts(
                 encoding="utf-8",
             )
 
-    html_path = out_dir / "baseline_cv_results.html"
+    html_path = out_dir / html_name
     html_path.write_text(
         "<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\"><title>Baseline CV</title></head><body>\n"
         + html

@@ -23,17 +23,28 @@ dependencies = [
     "tqdm",
 ]
 
+[project.optional-dependencies]
+dl = [
+    "torch>=2.0",
+    "transformers>=4.36",
+    "torch-geometric>=2.4",
+]
+
 [tool.setuptools]
 package-dir = { "" = "src" }
 py-modules = [
     "features_data",
     "load_data",
     "score_data",
+    "score_data_cqr",
     "baseline",
     "viz",
-    "uncertainty",
     "reporting",
     "submission",
     "tmap_viewer_html",
     "fp_embedding_compare",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["models*", "uncertainty*"]
