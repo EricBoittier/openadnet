@@ -313,3 +313,140 @@ def run_chemberta_regressor_cv(
         )
     fold_df = pd.DataFrame(rows)
     return fold_df, summarize_cv_folds(fold_df)
+
+
+def run_svr_lgbm_hgb_mpnn_gcn_ensemble_cv(
+    train_df: pd.DataFrame,
+    smiles_col: str,
+    target_cols: list[str],
+    *,
+    descriptor_name: str = "morgan_r1_count_1024",
+    config: Optional[BaselineCVConfig] = None,
+    epochs: int = 30,
+    batch_size: int = 32,
+    learning_rate: float = 1e-3,
+    weight_decay: float = 0.0,
+    hidden_dim: int = 64,
+    num_layers: int = 3,
+    gat_heads: int = 4,
+    show_progress: bool = True,
+    fit_show_progress: bool = False,
+    device: Optional[torch.device] = None,
+    weights: Optional[Sequence[float]] = None,
+    model_random_state: int = 0,
+) -> tuple[pd.DataFrame, pd.Series]:
+    """5-model **uniform** (or weighted) ensemble: SVR + LGBM + HGB on fingerprints,
+    plus **MPNN** and **GCN** on the same train/val split (graph features only).
+
+    Fingerprint rows use :func:`features_data.build_descriptor_matrix` for
+    ``descriptor_name``; sklearn members use :class:`FingerprintEnsembleMember`
+    with :func:`baseline.make_regressor_pipeline` semantics.
+
+    Parameters mirror :func:`run_gnn_regressor_cv` for the two GNN heads.
+    """
+    from rdkit import Chem
+
+    from features_data import build_descriptor_matrix
+    from models.ensemble import EnsembleRegressor, FingerprintEnsembleMember
+
+    cfg = config or BaselineCVConfig()
+    work = prepare_regression_frame(train_df, smiles_col, target_cols)
+    mols = list(work[smiles_col].apply(Chem.MolFromSmiles))
+    ok = np.array([m is not None for m in mols], dtype=bool)
+    if not ok.all():
+        work = work.loc[ok].reset_index(drop=True)
+        mols = [m for m, ol in zip(mols, ok) if ol]
+    n_tasks = len(target_cols)
+    n_samples = len(work)
+    if n_samples < 2:
+        raise ValueError("need at least 2 valid molecules for CV")
+
+    regs = default_regressors(model_random_state)
+    kf = KFold(
+        n_splits=cfg.n_splits,
+        shuffle=cfg.shuffle,
+        random_state=cfg.cv_random_state,
+    )
+    rows: list[dict[str, float | int]] = []
+    fold_iter = enumerate(kf.split(np.arange(n_samples)))
+    if show_progress:
+        fold_iter = tqdm(
+            list(fold_iter),
+            desc="ensemble_cv",
+            unit="fold",
+        )
+    for fold_id, (train_idx, val_idx) in fold_iter:
+        train_part = work.iloc[train_idx]
+        val_part = work.iloc[val_idx]
+        train_mols = [mols[i] for i in train_idx]
+        val_mols = [mols[i] for i in val_idx]
+        X_train_fp = build_descriptor_matrix(descriptor_name, train_mols).astype(
+            np.float64
+        )
+        X_val_fp = build_descriptor_matrix(descriptor_name, val_mols).astype(
+            np.float64
+        )
+
+        train_ds = graph_regression_from_dataframe(
+            train_part,
+            smiles_col,
+            target_cols,
+            descriptor_name=None,
+        )
+        val_ds = graph_regression_from_dataframe(
+            val_part,
+            smiles_col,
+            target_cols,
+            descriptor_name=None,
+        )
+
+        members = [
+            FingerprintEnsembleMember("svr", clone(regs["svr"]), n_tasks=n_tasks),
+            FingerprintEnsembleMember("lgbm", clone(regs["lgbm"]), n_tasks=n_tasks),
+            FingerprintEnsembleMember("hgb", clone(regs["hgb"]), n_tasks=n_tasks),
+            PyGMoleculeRegressor(
+                n_tasks=n_tasks,
+                architecture="mpnn",
+                hidden_dim=hidden_dim,
+                num_layers=num_layers,
+                gat_heads=gat_heads,
+                device=device,
+            ),
+            PyGMoleculeRegressor(
+                n_tasks=n_tasks,
+                architecture="gcn",
+                hidden_dim=hidden_dim,
+                num_layers=num_layers,
+                gat_heads=gat_heads,
+                device=device,
+            ),
+        ]
+        ensemble = EnsembleRegressor(members, weights=weights)
+        ensemble.fit(
+            train_ds,
+            X_fp=X_train_fp,
+            epochs=epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+            weight_decay=weight_decay,
+            val_dataset=val_ds,
+            show_progress=fit_show_progress,
+        )
+        y_pred = ensemble.predict(
+            val_ds,
+            X_fp=X_val_fp,
+            batch_size=batch_size,
+            show_progress=False,
+        )
+        y_true = val_ds.y
+        m = regression_metrics(y_true, y_pred)
+        rows.append(
+            {
+                "fold": fold_id,
+                **m,
+                "n_train": len(train_ds),
+                "n_val": len(val_ds),
+            }
+        )
+    fold_df = pd.DataFrame(rows)
+    return fold_df, summarize_cv_folds(fold_df)
