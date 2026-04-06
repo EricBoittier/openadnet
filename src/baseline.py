@@ -303,6 +303,56 @@ def run_baseline_cv(
     return df.sort_values("mean_rmse", ascending=True).reset_index(drop=True)
 
 
+def dataframe_from_cv_cache(
+    train_df: pd.DataFrame,
+    mols: list,
+    *,
+    descriptor_names: list[str] | None = None,
+    regressors: dict[str, Any] | None = None,
+    config: BaselineCVConfig | None = None,
+    cv_cache_path: Path | None = None,
+) -> pd.DataFrame:
+    """
+    Rebuild the baseline CV results table using only entries in the JSON cache
+    (``outputs/baseline_cv_cache.json`` by default). Does not run cross-validation.
+
+    Raises ``ValueError`` if the cache schema or ``train_id`` does not match the
+    current training data, or if any (descriptor, model) pair is missing.
+    """
+    cfg = config or BaselineCVConfig()
+    _, _, mask = prepare_training_data(train_df, mols, y_col=cfg.y_col)
+    train_f = train_df.loc[mask].reset_index(drop=True)
+    train_id = train_set_id(train_f, cfg.y_col)
+    names = descriptor_names or list_descriptor_names()
+    regs = regressors or default_regressors(cfg.model_random_state)
+    cache_file = cv_cache_path if cv_cache_path is not None else default_cv_cache_path()
+    loaded = _load_cv_cache(cache_file)
+    if loaded.get("schema") != CV_RESULT_CACHE_SCHEMA:
+        raise ValueError(
+            f"cache schema {loaded.get('schema')!r} != {CV_RESULT_CACHE_SCHEMA!r}"
+        )
+    if loaded.get("train_id") != train_id:
+        raise ValueError(
+            f"cache train_id {loaded.get('train_id')!r} != current {train_id!r}"
+        )
+    entries = loaded.get("entries", {})
+    rows: list[dict[str, Any]] = []
+    missing: list[tuple[str, str]] = []
+    for desc, model_name in product(names, regs.keys()):
+        ck = _cv_cache_key(train_id, desc, model_name, cfg)
+        if ck in entries:
+            rows.append(dict(entries[ck]))
+        else:
+            missing.append((desc, model_name))
+    if missing:
+        raise ValueError(
+            f"{len(missing)} (descriptor, model) pairs missing from {cache_file}; "
+            f"first few: {missing[:5]}"
+        )
+    df = pd.DataFrame(rows)
+    return df.sort_values("mean_rmse", ascending=True).reset_index(drop=True)
+
+
 def run_baseline_cqr_cv(
     train_df: pd.DataFrame,
     mols: list,

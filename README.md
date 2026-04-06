@@ -68,6 +68,17 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <tr>
 <th scope="row" style="text-align:left;"><strong>0</strong></th>
 <td style="text-align:right;">morgan_r1_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7336</td>
+<td style="text-align:right;">0.0192</td>
+<td style="text-align:right;">0.5460</td>
+<td style="text-align:right;">0.0149</td>
+<td style="text-align:right;">0.5705</td>
+<td style="text-align:right;">0.0284</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>1</strong></th>
+<td style="text-align:right;">morgan_r1_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7341</td>
 <td style="text-align:right;">0.0188</td>
@@ -77,7 +88,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0273</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>1</strong></th>
+<th scope="row" style="text-align:left;"><strong>2</strong></th>
 <td style="text-align:right;">morgan_r1_count_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7354</td>
@@ -88,7 +99,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0264</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>2</strong></th>
+<th scope="row" style="text-align:left;"><strong>3</strong></th>
+<td style="text-align:right;">morgan_r1_count_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7354</td>
+<td style="text-align:right;">0.0186</td>
+<td style="text-align:right;">0.5452</td>
+<td style="text-align:right;">0.0160</td>
+<td style="text-align:right;">0.5685</td>
+<td style="text-align:right;">0.0265</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>4</strong></th>
 <td style="text-align:right;">morgan_r2_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7416</td>
@@ -99,7 +121,29 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0202</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>3</strong></th>
+<th scope="row" style="text-align:left;"><strong>5</strong></th>
+<td style="text-align:right;">morgan_r2_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7416</td>
+<td style="text-align:right;">0.0147</td>
+<td style="text-align:right;">0.5544</td>
+<td style="text-align:right;">0.0135</td>
+<td style="text-align:right;">0.5615</td>
+<td style="text-align:right;">0.0202</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>6</strong></th>
+<td style="text-align:right;">morgan_r2_count_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7434</td>
+<td style="text-align:right;">0.0170</td>
+<td style="text-align:right;">0.5578</td>
+<td style="text-align:right;">0.0131</td>
+<td style="text-align:right;">0.5593</td>
+<td style="text-align:right;">0.0228</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>7</strong></th>
 <td style="text-align:right;">morgan_r2_count_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7434</td>
@@ -110,7 +154,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0228</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>4</strong></th>
+<th scope="row" style="text-align:left;"><strong>8</strong></th>
 <td style="text-align:right;">morgan_r1_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7497</td>
@@ -121,7 +165,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0272</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>5</strong></th>
+<th scope="row" style="text-align:left;"><strong>9</strong></th>
+<td style="text-align:right;">morgan_r1_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7498</td>
+<td style="text-align:right;">0.0184</td>
+<td style="text-align:right;">0.5557</td>
+<td style="text-align:right;">0.0180</td>
+<td style="text-align:right;">0.5515</td>
+<td style="text-align:right;">0.0272</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>10</strong></th>
 <td style="text-align:right;">atom_pair_count_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7582</td>
@@ -132,7 +187,29 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0206</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>6</strong></th>
+<th scope="row" style="text-align:left;"><strong>11</strong></th>
+<td style="text-align:right;">atom_pair_count_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7597</td>
+<td style="text-align:right;">0.0150</td>
+<td style="text-align:right;">0.5670</td>
+<td style="text-align:right;">0.0170</td>
+<td style="text-align:right;">0.5399</td>
+<td style="text-align:right;">0.0185</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>12</strong></th>
+<td style="text-align:right;">atom_pair_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7600</td>
+<td style="text-align:right;">0.0116</td>
+<td style="text-align:right;">0.5671</td>
+<td style="text-align:right;">0.0126</td>
+<td style="text-align:right;">0.5396</td>
+<td style="text-align:right;">0.0158</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>13</strong></th>
 <td style="text-align:right;">atom_pair_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7601</td>
@@ -143,7 +220,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0172</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>7</strong></th>
+<th scope="row" style="text-align:left;"><strong>14</strong></th>
 <td style="text-align:right;">morgan_r2_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7645</td>
@@ -154,7 +231,29 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0220</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>8</strong></th>
+<th scope="row" style="text-align:left;"><strong>15</strong></th>
+<td style="text-align:right;">morgan_r2_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7645</td>
+<td style="text-align:right;">0.0170</td>
+<td style="text-align:right;">0.5739</td>
+<td style="text-align:right;">0.0135</td>
+<td style="text-align:right;">0.5340</td>
+<td style="text-align:right;">0.0220</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>16</strong></th>
+<td style="text-align:right;">morgan_r2_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7674</td>
+<td style="text-align:right;">0.0078</td>
+<td style="text-align:right;">0.5794</td>
+<td style="text-align:right;">0.0098</td>
+<td style="text-align:right;">0.5303</td>
+<td style="text-align:right;">0.0220</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>17</strong></th>
 <td style="text-align:right;">morgan_r2_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7674</td>
@@ -165,7 +264,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0220</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>9</strong></th>
+<th scope="row" style="text-align:left;"><strong>18</strong></th>
+<td style="text-align:right;">morgan_r1_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7694</td>
+<td style="text-align:right;">0.0051</td>
+<td style="text-align:right;">0.5773</td>
+<td style="text-align:right;">0.0064</td>
+<td style="text-align:right;">0.5278</td>
+<td style="text-align:right;">0.0231</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>19</strong></th>
 <td style="text-align:right;">morgan_r1_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7694</td>
@@ -176,7 +286,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0231</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>10</strong></th>
+<th scope="row" style="text-align:left;"><strong>20</strong></th>
 <td style="text-align:right;">atom_pair_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7755</td>
@@ -187,7 +297,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0159</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>11</strong></th>
+<th scope="row" style="text-align:left;"><strong>21</strong></th>
+<td style="text-align:right;">morgan_r1_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7766</td>
+<td style="text-align:right;">0.0079</td>
+<td style="text-align:right;">0.5864</td>
+<td style="text-align:right;">0.0079</td>
+<td style="text-align:right;">0.5192</td>
+<td style="text-align:right;">0.0169</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>22</strong></th>
 <td style="text-align:right;">morgan_r1_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7766</td>
@@ -198,7 +319,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0169</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>12</strong></th>
+<th scope="row" style="text-align:left;"><strong>23</strong></th>
+<td style="text-align:right;">morgan_r2_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7802</td>
+<td style="text-align:right;">0.0100</td>
+<td style="text-align:right;">0.5915</td>
+<td style="text-align:right;">0.0107</td>
+<td style="text-align:right;">0.5146</td>
+<td style="text-align:right;">0.0223</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>24</strong></th>
 <td style="text-align:right;">morgan_r2_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7802</td>
@@ -209,7 +341,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0223</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>13</strong></th>
+<th scope="row" style="text-align:left;"><strong>25</strong></th>
+<td style="text-align:right;">atom_pair_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7817</td>
+<td style="text-align:right;">0.0215</td>
+<td style="text-align:right;">0.5845</td>
+<td style="text-align:right;">0.0184</td>
+<td style="text-align:right;">0.5130</td>
+<td style="text-align:right;">0.0203</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>26</strong></th>
 <td style="text-align:right;">atom_pair_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7823</td>
@@ -220,7 +363,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0215</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>14</strong></th>
+<th scope="row" style="text-align:left;"><strong>27</strong></th>
 <td style="text-align:right;">atom_pair_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7831</td>
@@ -231,7 +374,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0110</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>15</strong></th>
+<th scope="row" style="text-align:left;"><strong>28</strong></th>
 <td style="text-align:right;">rdkit_phys_props</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7859</td>
@@ -242,7 +385,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0267</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>16</strong></th>
+<th scope="row" style="text-align:left;"><strong>29</strong></th>
 <td style="text-align:right;">rdkit_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7868</td>
@@ -253,7 +396,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0215</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>17</strong></th>
+<th scope="row" style="text-align:left;"><strong>30</strong></th>
 <td style="text-align:right;">morgan_r1_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.7868</td>
@@ -264,7 +407,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0294</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>18</strong></th>
+<th scope="row" style="text-align:left;"><strong>31</strong></th>
 <td style="text-align:right;">morgan_r1_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.7896</td>
@@ -275,7 +418,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>19</strong></th>
+<th scope="row" style="text-align:left;"><strong>32</strong></th>
 <td style="text-align:right;">morgan_r2_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.7907</td>
@@ -286,7 +429,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0266</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>20</strong></th>
+<th scope="row" style="text-align:left;"><strong>33</strong></th>
+<td style="text-align:right;">atom_pair_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7913</td>
+<td style="text-align:right;">0.0197</td>
+<td style="text-align:right;">0.5925</td>
+<td style="text-align:right;">0.0152</td>
+<td style="text-align:right;">0.5007</td>
+<td style="text-align:right;">0.0269</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>34</strong></th>
 <td style="text-align:right;">atom_pair_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7913</td>
@@ -297,7 +451,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0269</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>21</strong></th>
+<th scope="row" style="text-align:left;"><strong>35</strong></th>
+<td style="text-align:right;">morgan_r1_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7913</td>
+<td style="text-align:right;">0.0151</td>
+<td style="text-align:right;">0.5926</td>
+<td style="text-align:right;">0.0160</td>
+<td style="text-align:right;">0.5007</td>
+<td style="text-align:right;">0.0230</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>36</strong></th>
 <td style="text-align:right;">morgan_r1_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7913</td>
@@ -308,7 +473,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0230</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>22</strong></th>
+<th scope="row" style="text-align:left;"><strong>37</strong></th>
 <td style="text-align:right;">rdkit_phys_props</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.7946</td>
@@ -319,7 +484,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0287</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>23</strong></th>
+<th scope="row" style="text-align:left;"><strong>38</strong></th>
+<td style="text-align:right;">rdkit_phys_props</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.7948</td>
+<td style="text-align:right;">0.0243</td>
+<td style="text-align:right;">0.5838</td>
+<td style="text-align:right;">0.0136</td>
+<td style="text-align:right;">0.4952</td>
+<td style="text-align:right;">0.0425</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>39</strong></th>
 <td style="text-align:right;">rdkit_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7955</td>
@@ -330,7 +506,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0235</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>24</strong></th>
+<th scope="row" style="text-align:left;"><strong>40</strong></th>
 <td style="text-align:right;">rdkit_phys_props</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.7960</td>
@@ -341,7 +517,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0420</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>25</strong></th>
+<th scope="row" style="text-align:left;"><strong>41</strong></th>
 <td style="text-align:right;">morgan_r1_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.7974</td>
@@ -352,7 +528,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0238</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>26</strong></th>
+<th scope="row" style="text-align:left;"><strong>42</strong></th>
 <td style="text-align:right;">atom_pair_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.7982</td>
@@ -363,7 +539,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0114</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>27</strong></th>
+<th scope="row" style="text-align:left;"><strong>43</strong></th>
 <td style="text-align:right;">rdkit_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8010</td>
@@ -374,7 +550,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0203</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>28</strong></th>
+<th scope="row" style="text-align:left;"><strong>44</strong></th>
 <td style="text-align:right;">morgan_r2_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8015</td>
@@ -385,7 +561,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0087</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>29</strong></th>
+<th scope="row" style="text-align:left;"><strong>45</strong></th>
 <td style="text-align:right;">atom_pair_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8027</td>
@@ -396,7 +572,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0189</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>30</strong></th>
+<th scope="row" style="text-align:left;"><strong>46</strong></th>
+<td style="text-align:right;">morgan_r2_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8027</td>
+<td style="text-align:right;">0.0133</td>
+<td style="text-align:right;">0.6054</td>
+<td style="text-align:right;">0.0110</td>
+<td style="text-align:right;">0.4860</td>
+<td style="text-align:right;">0.0275</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>47</strong></th>
 <td style="text-align:right;">morgan_r2_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8027</td>
@@ -407,7 +594,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0275</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>31</strong></th>
+<th scope="row" style="text-align:left;"><strong>48</strong></th>
+<td style="text-align:right;">torsion_count_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8033</td>
+<td style="text-align:right;">0.0083</td>
+<td style="text-align:right;">0.6076</td>
+<td style="text-align:right;">0.0075</td>
+<td style="text-align:right;">0.4856</td>
+<td style="text-align:right;">0.0186</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>49</strong></th>
 <td style="text-align:right;">torsion_count_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8054</td>
@@ -418,7 +616,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0162</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>32</strong></th>
+<th scope="row" style="text-align:left;"><strong>50</strong></th>
 <td style="text-align:right;">morgan_r2_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8060</td>
@@ -429,7 +627,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0344</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>33</strong></th>
+<th scope="row" style="text-align:left;"><strong>51</strong></th>
 <td style="text-align:right;">rdkit_count_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8066</td>
@@ -440,7 +638,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0299</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>34</strong></th>
+<th scope="row" style="text-align:left;"><strong>52</strong></th>
+<td style="text-align:right;">rdkit_count_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8077</td>
+<td style="text-align:right;">0.0086</td>
+<td style="text-align:right;">0.6068</td>
+<td style="text-align:right;">0.0090</td>
+<td style="text-align:right;">0.4793</td>
+<td style="text-align:right;">0.0307</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>53</strong></th>
 <td style="text-align:right;">morgan_r2_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8092</td>
@@ -451,7 +660,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0076</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>35</strong></th>
+<th scope="row" style="text-align:left;"><strong>54</strong></th>
 <td style="text-align:right;">morgan_r1_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8100</td>
@@ -462,7 +671,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0223</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>36</strong></th>
+<th scope="row" style="text-align:left;"><strong>55</strong></th>
+<td style="text-align:right;">torsion_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8118</td>
+<td style="text-align:right;">0.0099</td>
+<td style="text-align:right;">0.6172</td>
+<td style="text-align:right;">0.0079</td>
+<td style="text-align:right;">0.4744</td>
+<td style="text-align:right;">0.0247</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>56</strong></th>
 <td style="text-align:right;">morgan_r0_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8125</td>
@@ -473,7 +693,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>37</strong></th>
+<th scope="row" style="text-align:left;"><strong>57</strong></th>
 <td style="text-align:right;">morgan_r0_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8125</td>
@@ -484,7 +704,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>38</strong></th>
+<th scope="row" style="text-align:left;"><strong>58</strong></th>
 <td style="text-align:right;">torsion_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8140</td>
@@ -495,7 +715,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0214</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>39</strong></th>
+<th scope="row" style="text-align:left;"><strong>59</strong></th>
 <td style="text-align:right;">torsion_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8146</td>
@@ -506,7 +726,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0242</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>40</strong></th>
+<th scope="row" style="text-align:left;"><strong>60</strong></th>
 <td style="text-align:right;">atom_pair_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8154</td>
@@ -517,7 +737,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0072</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>41</strong></th>
+<th scope="row" style="text-align:left;"><strong>61</strong></th>
 <td style="text-align:right;">rdkit_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8156</td>
@@ -528,7 +748,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0299</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>42</strong></th>
+<th scope="row" style="text-align:left;"><strong>62</strong></th>
 <td style="text-align:right;">rdkit_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8158</td>
@@ -539,7 +759,29 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0256</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>43</strong></th>
+<th scope="row" style="text-align:left;"><strong>63</strong></th>
+<td style="text-align:right;">torsion_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8158</td>
+<td style="text-align:right;">0.0111</td>
+<td style="text-align:right;">0.6139</td>
+<td style="text-align:right;">0.0068</td>
+<td style="text-align:right;">0.4693</td>
+<td style="text-align:right;">0.0239</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>64</strong></th>
+<td style="text-align:right;">rdkit_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8176</td>
+<td style="text-align:right;">0.0042</td>
+<td style="text-align:right;">0.6203</td>
+<td style="text-align:right;">0.0081</td>
+<td style="text-align:right;">0.4667</td>
+<td style="text-align:right;">0.0273</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>65</strong></th>
 <td style="text-align:right;">morgan_r0_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8193</td>
@@ -550,9 +792,9 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0261</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>44</strong></th>
+<th scope="row" style="text-align:left;"><strong>66</strong></th>
 <td style="text-align:right;">morgan_r0_count_2048</td>
-<td style="text-align:right;">hgb</td>
+<td style="text-align:right;">lgbm</td>
 <td style="text-align:right;">0.8197</td>
 <td style="text-align:right;">0.0124</td>
 <td style="text-align:right;">0.6029</td>
@@ -561,7 +803,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0258</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>45</strong></th>
+<th scope="row" style="text-align:left;"><strong>67</strong></th>
+<td style="text-align:right;">morgan_r0_count_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8197</td>
+<td style="text-align:right;">0.0124</td>
+<td style="text-align:right;">0.6029</td>
+<td style="text-align:right;">0.0128</td>
+<td style="text-align:right;">0.4642</td>
+<td style="text-align:right;">0.0258</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>68</strong></th>
 <td style="text-align:right;">morgan_r0_count_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8197</td>
@@ -572,7 +825,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0258</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>46</strong></th>
+<th scope="row" style="text-align:left;"><strong>69</strong></th>
+<td style="text-align:right;">morgan_r0_count_2048</td>
+<td style="text-align:right;">hgb</td>
+<td style="text-align:right;">0.8197</td>
+<td style="text-align:right;">0.0124</td>
+<td style="text-align:right;">0.6029</td>
+<td style="text-align:right;">0.0128</td>
+<td style="text-align:right;">0.4642</td>
+<td style="text-align:right;">0.0258</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>70</strong></th>
 <td style="text-align:right;">morgan_r2_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8202</td>
@@ -583,7 +847,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0226</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>47</strong></th>
+<th scope="row" style="text-align:left;"><strong>71</strong></th>
 <td style="text-align:right;">morgan_r1_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8209</td>
@@ -594,7 +858,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0219</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>48</strong></th>
+<th scope="row" style="text-align:left;"><strong>72</strong></th>
+<td style="text-align:right;">torsion_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8217</td>
+<td style="text-align:right;">0.0113</td>
+<td style="text-align:right;">0.6219</td>
+<td style="text-align:right;">0.0067</td>
+<td style="text-align:right;">0.4616</td>
+<td style="text-align:right;">0.0241</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>73</strong></th>
 <td style="text-align:right;">torsion_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8217</td>
@@ -605,7 +880,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0241</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>49</strong></th>
+<th scope="row" style="text-align:left;"><strong>74</strong></th>
 <td style="text-align:right;">morgan_r2_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8219</td>
@@ -616,7 +891,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0296</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>50</strong></th>
+<th scope="row" style="text-align:left;"><strong>75</strong></th>
 <td style="text-align:right;">morgan_r1_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8235</td>
@@ -627,7 +902,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0216</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>51</strong></th>
+<th scope="row" style="text-align:left;"><strong>76</strong></th>
 <td style="text-align:right;">morgan_r2_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8237</td>
@@ -638,7 +913,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0253</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>52</strong></th>
+<th scope="row" style="text-align:left;"><strong>77</strong></th>
 <td style="text-align:right;">atom_pair_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8251</td>
@@ -649,7 +924,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0153</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>53</strong></th>
+<th scope="row" style="text-align:left;"><strong>78</strong></th>
 <td style="text-align:right;">morgan_r1_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8252</td>
@@ -660,7 +935,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0206</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>54</strong></th>
+<th scope="row" style="text-align:left;"><strong>79</strong></th>
 <td style="text-align:right;">atom_pair_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8258</td>
@@ -671,7 +946,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0149</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>55</strong></th>
+<th scope="row" style="text-align:left;"><strong>80</strong></th>
 <td style="text-align:right;">atom_pair_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8265</td>
@@ -682,7 +957,29 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0270</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>56</strong></th>
+<th scope="row" style="text-align:left;"><strong>81</strong></th>
+<td style="text-align:right;">atom_pair_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8265</td>
+<td style="text-align:right;">0.0164</td>
+<td style="text-align:right;">0.6236</td>
+<td style="text-align:right;">0.0164</td>
+<td style="text-align:right;">0.4552</td>
+<td style="text-align:right;">0.0270</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>82</strong></th>
+<td style="text-align:right;">morgan_r0_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8296</td>
+<td style="text-align:right;">0.0126</td>
+<td style="text-align:right;">0.6141</td>
+<td style="text-align:right;">0.0063</td>
+<td style="text-align:right;">0.4510</td>
+<td style="text-align:right;">0.0269</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>83</strong></th>
 <td style="text-align:right;">morgan_r0_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8297</td>
@@ -693,7 +990,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0268</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>57</strong></th>
+<th scope="row" style="text-align:left;"><strong>84</strong></th>
 <td style="text-align:right;">morgan_r1_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8298</td>
@@ -704,7 +1001,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0218</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>58</strong></th>
+<th scope="row" style="text-align:left;"><strong>85</strong></th>
 <td style="text-align:right;">torsion_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8323</td>
@@ -715,7 +1012,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0262</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>59</strong></th>
+<th scope="row" style="text-align:left;"><strong>86</strong></th>
+<td style="text-align:right;">torsion_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8323</td>
+<td style="text-align:right;">0.0101</td>
+<td style="text-align:right;">0.6335</td>
+<td style="text-align:right;">0.0054</td>
+<td style="text-align:right;">0.4474</td>
+<td style="text-align:right;">0.0262</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>87</strong></th>
 <td style="text-align:right;">morgan_r0_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8324</td>
@@ -726,7 +1034,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0261</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>60</strong></th>
+<th scope="row" style="text-align:left;"><strong>88</strong></th>
 <td style="text-align:right;">morgan_r0_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8326</td>
@@ -737,7 +1045,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0264</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>61</strong></th>
+<th scope="row" style="text-align:left;"><strong>89</strong></th>
 <td style="text-align:right;">morgan_r2_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8327</td>
@@ -748,7 +1056,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0095</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>62</strong></th>
+<th scope="row" style="text-align:left;"><strong>90</strong></th>
+<td style="text-align:right;">torsion_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8330</td>
+<td style="text-align:right;">0.0074</td>
+<td style="text-align:right;">0.6355</td>
+<td style="text-align:right;">0.0096</td>
+<td style="text-align:right;">0.4466</td>
+<td style="text-align:right;">0.0228</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>91</strong></th>
 <td style="text-align:right;">torsion_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8330</td>
@@ -759,7 +1078,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0228</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>63</strong></th>
+<th scope="row" style="text-align:left;"><strong>92</strong></th>
 <td style="text-align:right;">rdkit_count_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8336</td>
@@ -770,7 +1089,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0328</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>64</strong></th>
+<th scope="row" style="text-align:left;"><strong>93</strong></th>
 <td style="text-align:right;">morgan_r2_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8338</td>
@@ -781,7 +1100,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0286</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>65</strong></th>
+<th scope="row" style="text-align:left;"><strong>94</strong></th>
+<td style="text-align:right;">rdkit_count_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8348</td>
+<td style="text-align:right;">0.0074</td>
+<td style="text-align:right;">0.6308</td>
+<td style="text-align:right;">0.0067</td>
+<td style="text-align:right;">0.4439</td>
+<td style="text-align:right;">0.0317</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>95</strong></th>
 <td style="text-align:right;">morgan_r1_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8350</td>
@@ -792,7 +1122,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0258</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>66</strong></th>
+<th scope="row" style="text-align:left;"><strong>96</strong></th>
 <td style="text-align:right;">torsion_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8352</td>
@@ -803,7 +1133,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0147</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>67</strong></th>
+<th scope="row" style="text-align:left;"><strong>97</strong></th>
 <td style="text-align:right;">rdkit_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8353</td>
@@ -814,7 +1144,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0238</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>68</strong></th>
+<th scope="row" style="text-align:left;"><strong>98</strong></th>
+<td style="text-align:right;">rdkit_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8353</td>
+<td style="text-align:right;">0.0086</td>
+<td style="text-align:right;">0.6339</td>
+<td style="text-align:right;">0.0080</td>
+<td style="text-align:right;">0.4436</td>
+<td style="text-align:right;">0.0238</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>99</strong></th>
 <td style="text-align:right;">morgan_r2_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8380</td>
@@ -825,7 +1166,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0216</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>69</strong></th>
+<th scope="row" style="text-align:left;"><strong>100</strong></th>
 <td style="text-align:right;">morgan_r0_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8384</td>
@@ -836,7 +1177,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0317</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>70</strong></th>
+<th scope="row" style="text-align:left;"><strong>101</strong></th>
 <td style="text-align:right;">torsion_count_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8388</td>
@@ -847,7 +1188,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0177</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>71</strong></th>
+<th scope="row" style="text-align:left;"><strong>102</strong></th>
 <td style="text-align:right;">morgan_r1_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8428</td>
@@ -858,7 +1199,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>72</strong></th>
+<th scope="row" style="text-align:left;"><strong>103</strong></th>
 <td style="text-align:right;">torsion_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8434</td>
@@ -869,7 +1210,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0127</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>73</strong></th>
+<th scope="row" style="text-align:left;"><strong>104</strong></th>
 <td style="text-align:right;">morgan_r1_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8435</td>
@@ -880,7 +1221,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0242</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>74</strong></th>
+<th scope="row" style="text-align:left;"><strong>105</strong></th>
 <td style="text-align:right;">torsion_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8451</td>
@@ -891,7 +1232,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0174</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>75</strong></th>
+<th scope="row" style="text-align:left;"><strong>106</strong></th>
 <td style="text-align:right;">morgan_r1_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8457</td>
@@ -902,7 +1243,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0201</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>76</strong></th>
+<th scope="row" style="text-align:left;"><strong>107</strong></th>
 <td style="text-align:right;">torsion_count_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8464</td>
@@ -913,7 +1254,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0213</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>77</strong></th>
+<th scope="row" style="text-align:left;"><strong>108</strong></th>
 <td style="text-align:right;">rdkit_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8472</td>
@@ -924,7 +1265,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0195</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>78</strong></th>
+<th scope="row" style="text-align:left;"><strong>109</strong></th>
 <td style="text-align:right;">rdkit_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8486</td>
@@ -935,7 +1276,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0305</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>79</strong></th>
+<th scope="row" style="text-align:left;"><strong>110</strong></th>
 <td style="text-align:right;">atom_pair_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8488</td>
@@ -946,7 +1287,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0209</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>80</strong></th>
+<th scope="row" style="text-align:left;"><strong>111</strong></th>
 <td style="text-align:right;">atom_pair_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8507</td>
@@ -957,7 +1298,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0227</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>81</strong></th>
+<th scope="row" style="text-align:left;"><strong>112</strong></th>
 <td style="text-align:right;">morgan_r2_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8530</td>
@@ -968,7 +1309,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0322</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>82</strong></th>
+<th scope="row" style="text-align:left;"><strong>113</strong></th>
 <td style="text-align:right;">morgan_r1_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8538</td>
@@ -979,7 +1320,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0177</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>83</strong></th>
+<th scope="row" style="text-align:left;"><strong>114</strong></th>
 <td style="text-align:right;">rdkit_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8545</td>
@@ -990,7 +1331,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0244</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>84</strong></th>
+<th scope="row" style="text-align:left;"><strong>115</strong></th>
 <td style="text-align:right;">atom_pair_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8559</td>
@@ -1001,7 +1342,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0155</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>85</strong></th>
+<th scope="row" style="text-align:left;"><strong>116</strong></th>
 <td style="text-align:right;">morgan_r1_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8596</td>
@@ -1012,7 +1353,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0208</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>86</strong></th>
+<th scope="row" style="text-align:left;"><strong>117</strong></th>
 <td style="text-align:right;">rdkit_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8612</td>
@@ -1023,7 +1364,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0257</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>87</strong></th>
+<th scope="row" style="text-align:left;"><strong>118</strong></th>
 <td style="text-align:right;">torsion_count_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8613</td>
@@ -1034,7 +1375,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0175</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>88</strong></th>
+<th scope="row" style="text-align:left;"><strong>119</strong></th>
 <td style="text-align:right;">atom_pair_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8633</td>
@@ -1045,7 +1386,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0240</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>89</strong></th>
+<th scope="row" style="text-align:left;"><strong>120</strong></th>
+<td style="text-align:right;">rdkit_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8636</td>
+<td style="text-align:right;">0.0064</td>
+<td style="text-align:right;">0.6592</td>
+<td style="text-align:right;">0.0078</td>
+<td style="text-align:right;">0.4051</td>
+<td style="text-align:right;">0.0289</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>121</strong></th>
 <td style="text-align:right;">rdkit_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8636</td>
@@ -1056,7 +1408,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0289</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>90</strong></th>
+<th scope="row" style="text-align:left;"><strong>122</strong></th>
 <td style="text-align:right;">morgan_r1_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8649</td>
@@ -1067,7 +1419,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0195</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>91</strong></th>
+<th scope="row" style="text-align:left;"><strong>123</strong></th>
 <td style="text-align:right;">atom_pair_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8686</td>
@@ -1078,7 +1430,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0147</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>92</strong></th>
+<th scope="row" style="text-align:left;"><strong>124</strong></th>
 <td style="text-align:right;">morgan_r2_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8687</td>
@@ -1089,7 +1441,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0318</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>93</strong></th>
+<th scope="row" style="text-align:left;"><strong>125</strong></th>
 <td style="text-align:right;">morgan_r1_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8687</td>
@@ -1100,7 +1452,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0033</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>94</strong></th>
+<th scope="row" style="text-align:left;"><strong>126</strong></th>
 <td style="text-align:right;">morgan_r2_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8701</td>
@@ -1111,7 +1463,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0199</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>95</strong></th>
+<th scope="row" style="text-align:left;"><strong>127</strong></th>
 <td style="text-align:right;">morgan_r1_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8709</td>
@@ -1122,7 +1474,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0605</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>96</strong></th>
+<th scope="row" style="text-align:left;"><strong>128</strong></th>
 <td style="text-align:right;">atom_pair_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.8714</td>
@@ -1133,7 +1485,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0119</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>97</strong></th>
+<th scope="row" style="text-align:left;"><strong>129</strong></th>
+<td style="text-align:right;">atom_pair_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.8726</td>
+<td style="text-align:right;">0.0130</td>
+<td style="text-align:right;">0.6606</td>
+<td style="text-align:right;">0.0158</td>
+<td style="text-align:right;">0.3931</td>
+<td style="text-align:right;">0.0172</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>130</strong></th>
 <td style="text-align:right;">atom_pair_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.8726</td>
@@ -1144,7 +1507,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0172</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>98</strong></th>
+<th scope="row" style="text-align:left;"><strong>131</strong></th>
 <td style="text-align:right;">atom_pair_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8734</td>
@@ -1155,7 +1518,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0212</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>99</strong></th>
+<th scope="row" style="text-align:left;"><strong>132</strong></th>
 <td style="text-align:right;">morgan_r2_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8736</td>
@@ -1166,7 +1529,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0233</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>100</strong></th>
+<th scope="row" style="text-align:left;"><strong>133</strong></th>
 <td style="text-align:right;">morgan_r1_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8773</td>
@@ -1177,7 +1540,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0072</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>101</strong></th>
+<th scope="row" style="text-align:left;"><strong>134</strong></th>
 <td style="text-align:right;">rdkit_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8780</td>
@@ -1188,7 +1551,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0293</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>102</strong></th>
+<th scope="row" style="text-align:left;"><strong>135</strong></th>
 <td style="text-align:right;">morgan_r2_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8781</td>
@@ -1199,7 +1562,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0060</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>103</strong></th>
+<th scope="row" style="text-align:left;"><strong>136</strong></th>
 <td style="text-align:right;">morgan_r2_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8805</td>
@@ -1210,7 +1573,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0160</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>104</strong></th>
+<th scope="row" style="text-align:left;"><strong>137</strong></th>
 <td style="text-align:right;">morgan_r1_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8805</td>
@@ -1221,7 +1584,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0171</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>105</strong></th>
+<th scope="row" style="text-align:left;"><strong>138</strong></th>
 <td style="text-align:right;">morgan_r2_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8819</td>
@@ -1232,7 +1595,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0420</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>106</strong></th>
+<th scope="row" style="text-align:left;"><strong>139</strong></th>
 <td style="text-align:right;">torsion_count_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8831</td>
@@ -1243,7 +1606,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0344</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>107</strong></th>
+<th scope="row" style="text-align:left;"><strong>140</strong></th>
 <td style="text-align:right;">torsion_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8847</td>
@@ -1254,7 +1617,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0263</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>108</strong></th>
+<th scope="row" style="text-align:left;"><strong>141</strong></th>
 <td style="text-align:right;">atom_pair_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8863</td>
@@ -1265,7 +1628,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0269</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>109</strong></th>
+<th scope="row" style="text-align:left;"><strong>142</strong></th>
 <td style="text-align:right;">torsion_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8865</td>
@@ -1276,7 +1639,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0251</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>110</strong></th>
+<th scope="row" style="text-align:left;"><strong>143</strong></th>
 <td style="text-align:right;">torsion_count_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8873</td>
@@ -1287,7 +1650,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>111</strong></th>
+<th scope="row" style="text-align:left;"><strong>144</strong></th>
 <td style="text-align:right;">morgan_r1_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.8878</td>
@@ -1298,7 +1661,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0209</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>112</strong></th>
+<th scope="row" style="text-align:left;"><strong>145</strong></th>
 <td style="text-align:right;">torsion_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8882</td>
@@ -1309,7 +1672,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0359</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>113</strong></th>
+<th scope="row" style="text-align:left;"><strong>146</strong></th>
 <td style="text-align:right;">torsion_count_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8882</td>
@@ -1320,7 +1683,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0330</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>114</strong></th>
+<th scope="row" style="text-align:left;"><strong>147</strong></th>
 <td style="text-align:right;">morgan_r1_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8903</td>
@@ -1331,7 +1694,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0158</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>115</strong></th>
+<th scope="row" style="text-align:left;"><strong>148</strong></th>
 <td style="text-align:right;">rdkit_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.8929</td>
@@ -1342,7 +1705,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0259</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>116</strong></th>
+<th scope="row" style="text-align:left;"><strong>149</strong></th>
 <td style="text-align:right;">rdkit_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8972</td>
@@ -1353,7 +1716,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0179</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>117</strong></th>
+<th scope="row" style="text-align:left;"><strong>150</strong></th>
 <td style="text-align:right;">morgan_r2_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.8989</td>
@@ -1364,7 +1727,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0154</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>118</strong></th>
+<th scope="row" style="text-align:left;"><strong>151</strong></th>
 <td style="text-align:right;">rdkit_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.9019</td>
@@ -1375,7 +1738,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0400</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>119</strong></th>
+<th scope="row" style="text-align:left;"><strong>152</strong></th>
 <td style="text-align:right;">atom_pair_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9024</td>
@@ -1386,7 +1749,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0305</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>120</strong></th>
+<th scope="row" style="text-align:left;"><strong>153</strong></th>
 <td style="text-align:right;">morgan_r2_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9051</td>
@@ -1397,7 +1760,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0134</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>121</strong></th>
+<th scope="row" style="text-align:left;"><strong>154</strong></th>
 <td style="text-align:right;">rdkit_phys_props</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9064</td>
@@ -1408,7 +1771,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0311</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>122</strong></th>
+<th scope="row" style="text-align:left;"><strong>155</strong></th>
 <td style="text-align:right;">rdkit_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.9084</td>
@@ -1419,7 +1782,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0482</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>123</strong></th>
+<th scope="row" style="text-align:left;"><strong>156</strong></th>
+<td style="text-align:right;">rdkit_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.9084</td>
+<td style="text-align:right;">0.0266</td>
+<td style="text-align:right;">0.6905</td>
+<td style="text-align:right;">0.0211</td>
+<td style="text-align:right;">0.3413</td>
+<td style="text-align:right;">0.0482</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>157</strong></th>
 <td style="text-align:right;">atom_pair_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9086</td>
@@ -1430,7 +1804,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0184</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>124</strong></th>
+<th scope="row" style="text-align:left;"><strong>158</strong></th>
 <td style="text-align:right;">rdkit_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9100</td>
@@ -1441,7 +1815,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0148</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>125</strong></th>
+<th scope="row" style="text-align:left;"><strong>159</strong></th>
 <td style="text-align:right;">atom_pair_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.9105</td>
@@ -1452,18 +1826,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0241</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>126</strong></th>
-<td style="text-align:right;">morgan_r0_count_1024</td>
-<td style="text-align:right;">ridge</td>
-<td style="text-align:right;">0.9114</td>
-<td style="text-align:right;">0.0506</td>
-<td style="text-align:right;">0.6758</td>
-<td style="text-align:right;">0.0174</td>
-<td style="text-align:right;">0.3388</td>
-<td style="text-align:right;">0.0435</td>
-</tr>
-<tr>
-<th scope="row" style="text-align:left;"><strong>127</strong></th>
+<th scope="row" style="text-align:left;"><strong>160</strong></th>
 <td style="text-align:right;">morgan_r0_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9114</td>
@@ -1474,7 +1837,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0435</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>128</strong></th>
+<th scope="row" style="text-align:left;"><strong>161</strong></th>
+<td style="text-align:right;">morgan_r0_count_1024</td>
+<td style="text-align:right;">ridge</td>
+<td style="text-align:right;">0.9114</td>
+<td style="text-align:right;">0.0506</td>
+<td style="text-align:right;">0.6758</td>
+<td style="text-align:right;">0.0174</td>
+<td style="text-align:right;">0.3388</td>
+<td style="text-align:right;">0.0435</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>162</strong></th>
 <td style="text-align:right;">morgan_r2_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9125</td>
@@ -1485,7 +1859,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0413</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>129</strong></th>
+<th scope="row" style="text-align:left;"><strong>163</strong></th>
 <td style="text-align:right;">morgan_r1_count_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9139</td>
@@ -1496,7 +1870,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0899</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>130</strong></th>
+<th scope="row" style="text-align:left;"><strong>164</strong></th>
 <td style="text-align:right;">rdkit_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9163</td>
@@ -1507,7 +1881,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0159</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>131</strong></th>
+<th scope="row" style="text-align:left;"><strong>165</strong></th>
 <td style="text-align:right;">rdkit_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9183</td>
@@ -1518,7 +1892,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0377</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>132</strong></th>
+<th scope="row" style="text-align:left;"><strong>166</strong></th>
 <td style="text-align:right;">morgan_r2_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9186</td>
@@ -1529,7 +1903,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0171</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>133</strong></th>
+<th scope="row" style="text-align:left;"><strong>167</strong></th>
 <td style="text-align:right;">rdkit_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.9199</td>
@@ -1540,7 +1914,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0375</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>134</strong></th>
+<th scope="row" style="text-align:left;"><strong>168</strong></th>
+<td style="text-align:right;">morgan_r0_bits_2048</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.9225</td>
+<td style="text-align:right;">0.0238</td>
+<td style="text-align:right;">0.7028</td>
+<td style="text-align:right;">0.0172</td>
+<td style="text-align:right;">0.3216</td>
+<td style="text-align:right;">0.0336</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>169</strong></th>
 <td style="text-align:right;">morgan_r0_bits_2048</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.9225</td>
@@ -1551,7 +1936,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0336</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>135</strong></th>
+<th scope="row" style="text-align:left;"><strong>170</strong></th>
+<td style="text-align:right;">morgan_r0_bits_1024</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.9225</td>
+<td style="text-align:right;">0.0238</td>
+<td style="text-align:right;">0.7029</td>
+<td style="text-align:right;">0.0172</td>
+<td style="text-align:right;">0.3215</td>
+<td style="text-align:right;">0.0336</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>171</strong></th>
 <td style="text-align:right;">morgan_r0_bits_1024</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.9225</td>
@@ -1562,7 +1958,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0336</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>136</strong></th>
+<th scope="row" style="text-align:left;"><strong>172</strong></th>
 <td style="text-align:right;">torsion_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9265</td>
@@ -1573,7 +1969,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0412</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>137</strong></th>
+<th scope="row" style="text-align:left;"><strong>173</strong></th>
 <td style="text-align:right;">morgan_r0_count_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9273</td>
@@ -1584,7 +1980,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0352</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>138</strong></th>
+<th scope="row" style="text-align:left;"><strong>174</strong></th>
 <td style="text-align:right;">morgan_r2_count_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9285</td>
@@ -1595,7 +1991,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0323</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>139</strong></th>
+<th scope="row" style="text-align:left;"><strong>175</strong></th>
 <td style="text-align:right;">morgan_r0_bits_1024</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.9289</td>
@@ -1606,7 +2002,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0351</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>140</strong></th>
+<th scope="row" style="text-align:left;"><strong>176</strong></th>
 <td style="text-align:right;">morgan_r0_bits_2048</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.9289</td>
@@ -1617,7 +2013,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0351</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>141</strong></th>
+<th scope="row" style="text-align:left;"><strong>177</strong></th>
 <td style="text-align:right;">torsion_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9321</td>
@@ -1628,7 +2024,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0366</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>142</strong></th>
+<th scope="row" style="text-align:left;"><strong>178</strong></th>
 <td style="text-align:right;">rdkit_phys_props</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9322</td>
@@ -1639,7 +2035,18 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0254</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>143</strong></th>
+<th scope="row" style="text-align:left;"><strong>179</strong></th>
+<td style="text-align:right;">morgan_r0_bits_512</td>
+<td style="text-align:right;">lgbm</td>
+<td style="text-align:right;">0.9361</td>
+<td style="text-align:right;">0.0197</td>
+<td style="text-align:right;">0.7142</td>
+<td style="text-align:right;">0.0160</td>
+<td style="text-align:right;">0.3013</td>
+<td style="text-align:right;">0.0344</td>
+</tr>
+<tr>
+<th scope="row" style="text-align:left;"><strong>180</strong></th>
 <td style="text-align:right;">morgan_r0_bits_512</td>
 <td style="text-align:right;">hgb</td>
 <td style="text-align:right;">0.9361</td>
@@ -1650,7 +2057,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0344</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>144</strong></th>
+<th scope="row" style="text-align:left;"><strong>181</strong></th>
 <td style="text-align:right;">morgan_r0_bits_512</td>
 <td style="text-align:right;">svr</td>
 <td style="text-align:right;">0.9384</td>
@@ -1661,7 +2068,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0397</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>145</strong></th>
+<th scope="row" style="text-align:left;"><strong>182</strong></th>
 <td style="text-align:right;">rdkit_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9408</td>
@@ -1672,7 +2079,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0145</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>146</strong></th>
+<th scope="row" style="text-align:left;"><strong>183</strong></th>
 <td style="text-align:right;">rdkit_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9414</td>
@@ -1683,7 +2090,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0252</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>147</strong></th>
+<th scope="row" style="text-align:left;"><strong>184</strong></th>
 <td style="text-align:right;">torsion_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9434</td>
@@ -1694,7 +2101,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0126</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>148</strong></th>
+<th scope="row" style="text-align:left;"><strong>185</strong></th>
 <td style="text-align:right;">torsion_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9440</td>
@@ -1705,7 +2112,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0052</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>149</strong></th>
+<th scope="row" style="text-align:left;"><strong>186</strong></th>
 <td style="text-align:right;">morgan_r0_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9441</td>
@@ -1716,7 +2123,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0225</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>150</strong></th>
+<th scope="row" style="text-align:left;"><strong>187</strong></th>
 <td style="text-align:right;">morgan_r0_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9441</td>
@@ -1727,7 +2134,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0225</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>151</strong></th>
+<th scope="row" style="text-align:left;"><strong>188</strong></th>
 <td style="text-align:right;">morgan_r0_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9465</td>
@@ -1738,7 +2145,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0288</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>152</strong></th>
+<th scope="row" style="text-align:left;"><strong>189</strong></th>
 <td style="text-align:right;">morgan_r0_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9465</td>
@@ -1749,7 +2156,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0288</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>153</strong></th>
+<th scope="row" style="text-align:left;"><strong>190</strong></th>
 <td style="text-align:right;">torsion_count_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9472</td>
@@ -1760,7 +2167,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0104</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>154</strong></th>
+<th scope="row" style="text-align:left;"><strong>191</strong></th>
 <td style="text-align:right;">morgan_r1_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9473</td>
@@ -1771,7 +2178,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0230</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>155</strong></th>
+<th scope="row" style="text-align:left;"><strong>192</strong></th>
 <td style="text-align:right;">torsion_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9475</td>
@@ -1782,7 +2189,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0118</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>156</strong></th>
+<th scope="row" style="text-align:left;"><strong>193</strong></th>
 <td style="text-align:right;">rdkit_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9519</td>
@@ -1793,7 +2200,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0154</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>157</strong></th>
+<th scope="row" style="text-align:left;"><strong>194</strong></th>
 <td style="text-align:right;">morgan_r0_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9557</td>
@@ -1804,7 +2211,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0184</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>158</strong></th>
+<th scope="row" style="text-align:left;"><strong>195</strong></th>
 <td style="text-align:right;">torsion_count_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9563</td>
@@ -1815,7 +2222,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0112</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>159</strong></th>
+<th scope="row" style="text-align:left;"><strong>196</strong></th>
 <td style="text-align:right;">rdkit_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9584</td>
@@ -1826,7 +2233,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0398</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>160</strong></th>
+<th scope="row" style="text-align:left;"><strong>197</strong></th>
 <td style="text-align:right;">atom_pair_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9599</td>
@@ -1837,7 +2244,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0154</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>161</strong></th>
+<th scope="row" style="text-align:left;"><strong>198</strong></th>
 <td style="text-align:right;">morgan_r0_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9611</td>
@@ -1848,7 +2255,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0348</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>162</strong></th>
+<th scope="row" style="text-align:left;"><strong>199</strong></th>
 <td style="text-align:right;">atom_pair_bits_512</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9675</td>
@@ -1859,7 +2266,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0204</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>163</strong></th>
+<th scope="row" style="text-align:left;"><strong>200</strong></th>
 <td style="text-align:right;">torsion_count_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9707</td>
@@ -1870,7 +2277,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0084</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>164</strong></th>
+<th scope="row" style="text-align:left;"><strong>201</strong></th>
 <td style="text-align:right;">morgan_r0_bits_1024</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9744</td>
@@ -1881,7 +2288,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0113</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>165</strong></th>
+<th scope="row" style="text-align:left;"><strong>202</strong></th>
 <td style="text-align:right;">morgan_r0_bits_2048</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9744</td>
@@ -1892,7 +2299,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0113</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>166</strong></th>
+<th scope="row" style="text-align:left;"><strong>203</strong></th>
 <td style="text-align:right;">morgan_r0_bits_2048</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.9755</td>
@@ -1903,7 +2310,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0191</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>167</strong></th>
+<th scope="row" style="text-align:left;"><strong>204</strong></th>
 <td style="text-align:right;">morgan_r0_bits_1024</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.9762</td>
@@ -1914,7 +2321,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0199</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>168</strong></th>
+<th scope="row" style="text-align:left;"><strong>205</strong></th>
 <td style="text-align:right;">rdkit_count_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9770</td>
@@ -1925,7 +2332,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0523</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>169</strong></th>
+<th scope="row" style="text-align:left;"><strong>206</strong></th>
 <td style="text-align:right;">morgan_r0_bits_512</td>
 <td style="text-align:right;">elasticnet</td>
 <td style="text-align:right;">0.9867</td>
@@ -1936,7 +2343,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0169</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>170</strong></th>
+<th scope="row" style="text-align:left;"><strong>207</strong></th>
 <td style="text-align:right;">torsion_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9884</td>
@@ -1947,7 +2354,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0833</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>171</strong></th>
+<th scope="row" style="text-align:left;"><strong>208</strong></th>
 <td style="text-align:right;">rdkit_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">0.9915</td>
@@ -1958,7 +2365,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0415</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>172</strong></th>
+<th scope="row" style="text-align:left;"><strong>209</strong></th>
 <td style="text-align:right;">morgan_r0_bits_512</td>
 <td style="text-align:right;">rf</td>
 <td style="text-align:right;">0.9950</td>
@@ -1969,7 +2376,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0211</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>173</strong></th>
+<th scope="row" style="text-align:left;"><strong>210</strong></th>
 <td style="text-align:right;">morgan_r1_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.0153</td>
@@ -1980,7 +2387,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.1363</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>174</strong></th>
+<th scope="row" style="text-align:left;"><strong>211</strong></th>
 <td style="text-align:right;">torsion_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.0301</td>
@@ -1991,7 +2398,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0532</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>175</strong></th>
+<th scope="row" style="text-align:left;"><strong>212</strong></th>
 <td style="text-align:right;">atom_pair_bits_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.0434</td>
@@ -2002,7 +2409,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0870</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>176</strong></th>
+<th scope="row" style="text-align:left;"><strong>213</strong></th>
 <td style="text-align:right;">atom_pair_count_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.0885</td>
@@ -2013,7 +2420,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.3803</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>177</strong></th>
+<th scope="row" style="text-align:left;"><strong>214</strong></th>
 <td style="text-align:right;">torsion_count_1024</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.1323</td>
@@ -2024,7 +2431,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.2321</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>178</strong></th>
+<th scope="row" style="text-align:left;"><strong>215</strong></th>
 <td style="text-align:right;">morgan_r2_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.1858</td>
@@ -2035,7 +2442,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0301</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>179</strong></th>
+<th scope="row" style="text-align:left;"><strong>216</strong></th>
 <td style="text-align:right;">morgan_r2_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.2050</td>
@@ -2046,7 +2453,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.0887</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>180</strong></th>
+<th scope="row" style="text-align:left;"><strong>217</strong></th>
 <td style="text-align:right;">rdkit_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.2427</td>
@@ -2057,7 +2464,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.1128</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>181</strong></th>
+<th scope="row" style="text-align:left;"><strong>218</strong></th>
 <td style="text-align:right;">atom_pair_bits_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.2625</td>
@@ -2068,7 +2475,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.1310</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>182</strong></th>
+<th scope="row" style="text-align:left;"><strong>219</strong></th>
 <td style="text-align:right;">rdkit_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.3146</td>
@@ -2079,7 +2486,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.1398</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>183</strong></th>
+<th scope="row" style="text-align:left;"><strong>220</strong></th>
 <td style="text-align:right;">atom_pair_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">1.8767</td>
@@ -2090,7 +2497,7 @@ Completed `(descriptor, model)` cross-validation metrics are stored in `outputs/
 <td style="text-align:right;">0.9225</td>
 </tr>
 <tr>
-<th scope="row" style="text-align:left;"><strong>184</strong></th>
+<th scope="row" style="text-align:left;"><strong>221</strong></th>
 <td style="text-align:right;">torsion_count_2048</td>
 <td style="text-align:right;">ridge</td>
 <td style="text-align:right;">2.5947</td>
@@ -2119,6 +2526,10 @@ After a run, see:
 cd openadnet
 PYTHONPATH=src python src/score_data.py
 ```
+
+To refresh the leaderboard table **from cached JSON only** (no new CV runs), use
+`scripts/readme_from_baseline_cache.py` — it fails if any pair is missing from
+`outputs/baseline_cv_cache.json` (use `--fill-missing` to compute missing pairs first).
 
 Requires Hugging Face Hub access for the training CSV on first load (cached afterward). Set `HF_TOKEN` for higher rate limits.
 

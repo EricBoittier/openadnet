@@ -5,7 +5,9 @@ First import of ``load_data`` may download CSVs from the Hub; later runs use the
 Hugging Face disk cache (and in-memory LRU cache). See ``load_data`` docstring.
 
 Writes ``outputs/baseline_cv_results.csv``, ``outputs/baseline_cv_results.html``,
-and updates the HTML table in ``README.md`` between marker comments.
+and updates the HTML table in ``README.md`` between marker comments. To rebuild
+artifacts from an already-complete ``outputs/baseline_cv_cache.json`` without new
+CV work, use ``scripts/readme_from_baseline_cache.py`` (see script docstring).
 
 Evaluates all fingerprint sizes (512–4096), Morgan radii 0–3, binary + count
 fingerprints, and ``rdkit_phys_props`` (57 descriptor sets × 6 models by default). Uses
