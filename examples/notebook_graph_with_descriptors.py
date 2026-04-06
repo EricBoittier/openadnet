@@ -18,11 +18,17 @@ Per-molecule descriptors use the same pipeline as sklearn baselines
     from models.data import graph_regression_from_dataframe
     from models.nn.pyg_regressor import PyGMoleculeRegressor
 
+    # Pass a string, or a tuple/list of names to concatenate (same order for dataset + model).
     ds = graph_regression_from_dataframe(
-        train.head(200), "SMILES", ["pEC50"], descriptor_name="morgan_r2_bits_512"
+        train.head(200),
+        "SMILES",
+        ["pEC50"],
+        descriptor_name=("rdkit_phys_props", "morgan_r2_bits_512"),
     )
     model = PyGMoleculeRegressor(
-        1, descriptor_name="morgan_r2_bits_512", hidden_dim=48
+        1,
+        descriptor_name=("rdkit_phys_props", "morgan_r2_bits_512"),
+        hidden_dim=48,
     )
     model.fit(ds, epochs=2, batch_size=16, show_progress=True)
 
@@ -33,7 +39,7 @@ Requires: ``pip install openadnet[dl]``.
 
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import Sequence, Union
 
 import pandas as pd
 
@@ -46,10 +52,10 @@ def make_graph_regression_dataset(
     smiles_col: str,
     target_cols: Sequence[str],
     *,
-    descriptor_name: str,
+    descriptor_name: Union[str, Sequence[str]],
     drop_na_targets: bool = True,
 ):
-    """Build :class:`~models.data.graph.GraphRegressionDataset` with broadcast descriptors."""
+    """Build :class:`~models.data.graph.GraphRegressionDataset` with broadcast descriptor(s)."""
     return graph_regression_from_dataframe(
         df,
         smiles_col,
@@ -62,7 +68,7 @@ def make_graph_regression_dataset(
 def make_pyg_regressor(
     n_tasks: int,
     *,
-    descriptor_name: str,
+    descriptor_name: Union[str, Sequence[str]],
     architecture: str = "gin",
     hidden_dim: int = 64,
     num_layers: int = 3,

@@ -1,6 +1,6 @@
 """PyTorch data utilities for SMILES/transformers and molecular graphs."""
 
-from features_data import descriptor_dim, descriptor_dim_total
+from features_data import descriptor_dim, descriptor_dim_for_names, descriptor_dim_total
 
 from models.data.graph import (
     ATOM_FEATURE_DIM,
@@ -34,6 +34,7 @@ __all__ = [
     "atom_feature_dim_with_descriptor",
     "coerce_graph_descriptor_names",
     "descriptor_dim",
+    "descriptor_dim_for_names",
     "descriptor_dim_total",
     "edge_feature_dim_default",
     "graph_regression_from_dataframe",

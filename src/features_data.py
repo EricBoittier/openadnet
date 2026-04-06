@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Sequence
+from typing import Sequence, Union
 from functools import lru_cache
 from pathlib import Path
 
@@ -310,6 +310,13 @@ def descriptor_dim(name: str) -> int:
 def descriptor_dim_total(names: Sequence[str]) -> int:
     """Sum of :func:`descriptor_dim` for each name (concatenated descriptor width)."""
     return sum(descriptor_dim(n) for n in names)
+
+
+def descriptor_dim_for_names(names: Union[str, Sequence[str]]) -> int:
+    """Width of one descriptor, or concatenated width when ``names`` is a list/tuple (order preserved)."""
+    if isinstance(names, str):
+        return descriptor_dim(names)
+    return descriptor_dim_total(names)
 
 
 # Legacy name for single constant (used in tests / imports)

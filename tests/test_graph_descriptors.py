@@ -18,13 +18,25 @@ def _have_dl() -> bool:
 
 class TestDescriptorDim(unittest.TestCase):
     def test_dims(self) -> None:
-        from features_data import descriptor_dim, descriptor_dim_total
+        from features_data import (
+            descriptor_dim,
+            descriptor_dim_for_names,
+            descriptor_dim_total,
+        )
 
         self.assertEqual(descriptor_dim("morgan_r2_bits_512"), 512)
         self.assertGreater(descriptor_dim("rdkit_phys_props"), 0)
         self.assertEqual(
             descriptor_dim_total(["morgan_r2_bits_512", "morgan_r2_bits_512"]),
             512 + 512,
+        )
+        self.assertEqual(
+            descriptor_dim_for_names("rdkit_phys_props"),
+            descriptor_dim("rdkit_phys_props"),
+        )
+        self.assertEqual(
+            descriptor_dim_for_names(("rdkit_phys_props", "morgan_r2_bits_512")),
+            descriptor_dim("rdkit_phys_props") + descriptor_dim("morgan_r2_bits_512"),
         )
 
 

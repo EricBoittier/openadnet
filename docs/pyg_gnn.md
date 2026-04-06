@@ -157,8 +157,9 @@ See § [Molecule-level descriptors as node features](#molecule-level-descriptors
 
 Baseline **per-molecule** fingerprints (same disk cache as sklearn in [`features_data.py`](../src/features_data.py)) can be concatenated to **every atom row** in [`mol_to_pyg_data`](../src/models/data/graph.py). This is **not** the JSON file `outputs/baseline_cv_cache.json` (that file stores CV metrics only).
 
-- Width helper: [`descriptor_dim`](../src/features_data.py)  
+- Width helpers: [`descriptor_dim`](../src/features_data.py) (one name), [`descriptor_dim_total`](../src/features_data.py) (sequence), [`descriptor_dim_for_names`](../src/features_data.py) (either a string or a sequence)  
 - Concat size: [`atom_feature_dim_with_descriptor`](../src/models/data/graph.py)  
+- **Combining descriptors:** pass **`descriptor_name=("rdkit_phys_props", "morgan_r2_bits_512")`** (or a list) to the dataset and `PyGMoleculeRegressor`; rows are built in [`GraphRegressionDataset.__getitem__`](../src/models/data/graph.py) by concatenating `build_descriptor_matrix` for each name in order. **Use the same tuple/list** for the dataset and the model so `in_dim` matches.  
 - Dataset / DataFrame: `GraphRegressionDataset(..., descriptor_name=...)` and [`graph_regression_from_dataframe`](../src/models/data/graph.py)  
 - Regressor: [`PyGMoleculeRegressor(..., descriptor_name=...)`](../src/models/nn/pyg_regressor.py)  
 - Notebook-oriented helpers: [`examples/notebook_graph_with_descriptors.py`](../examples/notebook_graph_with_descriptors.py) (add **repo root** to `sys.path` if you `import examples...`, or call the same functions via `models` as in the notebook)
