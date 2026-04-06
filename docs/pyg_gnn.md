@@ -117,7 +117,8 @@ sequenceDiagram
 
 - Implementation: [`run_gnn_regressor_cv`](../src/models/cv_dl.py#L148) in [`cv_dl.py`](../src/models/cv_dl.py)  
 - CLI example: [`scripts/cv_gnn_regressor.py`](../scripts/cv_gnn_regressor.py) (`--descriptor-name` for fused features)  
-- Quick subset example: [`examples/quick_cv_gnn_subset.py`](../examples/quick_cv_gnn_subset.py) (`--descriptor-name`)
+- Quick subset example: [`examples/quick_cv_gnn_subset.py`](../examples/quick_cv_gnn_subset.py) (`--descriptor-name`)  
+- **Hydra sweeps:** [`scripts/hydra_gnn_sweep.py`](../scripts/hydra_gnn_sweep.py) with [`conf/gnn_sweep/config.yaml`](../conf/gnn_sweep/config.yaml) — install `openadnet[dl,hydra]`, then e.g. `PYTHONPATH=src python scripts/hydra_gnn_sweep.py --multirun model.architecture=gin,gat,mpnn model.hidden_dim=64,128`
 
 **Notebook-style CV with extra node features** — add **`descriptor_name`** (same keys as `features_data.list_descriptor_names()`):
 

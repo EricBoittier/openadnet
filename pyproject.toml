@@ -31,6 +31,9 @@ dl = [
     "transformers>=4.36",
     "torch-geometric>=2.4",
 ]
+hydra = [
+    "hydra-core>=1.3.2",
+]
 
 [tool.pylint.main]
 # Default fail-under=10 fails the run when the score is below 10; this repo is not fully pylint-clean.

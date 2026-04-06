@@ -1,0 +1,52 @@
+# Hydra config for scripts/hydra_gnn_sweep.py (K-fold CV on PyG GNN regressors).
+#
+# Examples (repo root, PYTHONPATH=src):
+#   python scripts/hydra_gnn_sweep.py
+#   python scripts/hydra_gnn_sweep.py model.architecture=mpnn train.epochs=50
+#   python scripts/hydra_gnn_sweep.py --multirun model.architecture=gin,gat,mpnn model.hidden_dim=64,128
+#   python scripts/hydra_gnn_sweep.py --multirun hydra/sweeper=grid hydra/launcher=basic model.architecture=gin,gat
+
+defaults:
+  - _self_
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: outputs/hydra_gnn/single/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/hydra_gnn/multirun/${now:%Y-%m-%d_%H-%M-%S}
+
+data:
+  # Hugging Face train table via load_data.train (same as other scripts).
+  smiles_col: SMILES
+  targets:
+    - pEC50
+  # If set, use only the first N rows (quick sweeps / debugging).
+  max_rows: null
+
+cv:
+  n_splits: 3
+  cv_seed: 0
+
+model:
+  architecture: gin
+  hidden_dim: 64
+  num_layers: 3
+  gat_heads: 4
+  # null | str | list of str — broadcast onto nodes (features_data keys)
+  descriptor_name: null
+
+train:
+  epochs: 2
+  batch_size: 32
+  learning_rate: 1.0e-3
+  weight_decay: 0.0
+
+run:
+  show_progress: true
+  fit_show_progress: false
+
+output:
+  save_csv: true
+  save_config: true
