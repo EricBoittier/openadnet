@@ -45,18 +45,21 @@
         border-bottom: 1px solid #e0c766;
         font-size: 0.875rem;
       }
-      :root.dark #webgpu-warning {
-        background: #3d3200;
-        color: #ffecb5;
-        border-bottom-color: #665500;
+      @media (prefers-color-scheme: dark) {
+        #webgpu-warning {
+          background: #3d3200;
+          color: #ffecb5;
+          border-bottom-color: #665500;
+        }
       }
     </style>
   </head>
   <body>
+    <p id="webgpu-warning"></p>
     <div id="app">
       <div id="toolbar">
         <label>
-          Open structure
+          <strong>Open structure</strong>
           <input
             type="file"
             id="file"
@@ -64,9 +67,9 @@
           />
         </label>
         <p class="hint">
-          Uses <code>loadData()</code> after you pick a file. Requires a built
-          <code>@pymol-rs/viewer</code> (WASM + <code>dist/</code>) and a
-          browser with WebGPU.
+          Choose a PDB, mmCIF, or BCIF file from your computer. The viewer runs
+          in your browser with WebGPU (recent Chrome, Edge, or Firefox Nightly
+          with WebGPU enabled).
         </p>
       </div>
       <div id="viewer" aria-label="Molecule viewer"></div>

@@ -1,5 +1,12 @@
 import { PyMolRSViewer } from "@pymol-rs/viewer";
 
+function showWebGpuBanner(message) {
+  const el = document.getElementById("webgpu-warning");
+  if (!el) return;
+  el.textContent = message;
+  el.style.display = "block";
+}
+
 function guessFormat(fileName) {
   const lower = fileName.toLowerCase();
   const parts = lower.split(".").filter(Boolean);
@@ -26,6 +33,12 @@ function baseName(fileName) {
 }
 
 async function main() {
+  if (!("gpu" in navigator)) {
+    showWebGpuBanner(
+      "WebGPU is not available in this browser. Try an up-to-date Chromium-based browser, or enable WebGPU in Firefox Nightly (about:config).",
+    );
+  }
+
   const root = document.getElementById("viewer");
   if (!root) throw new Error("#viewer missing");
 
