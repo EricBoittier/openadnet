@@ -50,9 +50,10 @@
           />
         </label>
         <p class="hint">
-          Choose a PDB, mmCIF, or BCIF file from your computer. The viewer runs
-          in your browser with WebGPU (recent Chrome, Edge, or Firefox Nightly
-          with WebGPU enabled).
+          Choose a PDB, mmCIF, or BCIF file from your computer. Uses WebGPU —
+          <strong>Chrome or Edge</strong> work best (especially on Linux).
+          Firefox often hits a known wgpu/WebGPU mismatch even when WebGPU looks
+          enabled; if the viewer crashes at startup, try Chromium.
         </p>
       </div>
       <div id="viewer" aria-label="Molecule viewer"></div>

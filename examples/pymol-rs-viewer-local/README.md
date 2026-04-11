@@ -60,6 +60,10 @@ npm run preview
 
 The example depends on `@pymol-rs/viewer` via a `file:` link, so WASM is loaded from that directory. `vite.config.js` adds **`server.fs.allow`** for the real path of `node_modules/@pymol-rs/viewer`. If you change the link target, restart the dev server after editing the config.
 
+### Panic: `canvas context is not a GPUCanvasContext` / `RuntimeError: unreachable executed`
+
+The WASM viewer uses **wgpu** on the WebGPU backend. In **Firefox** (often on **Linux**), `canvas.getContext("webgpu")` can return a real `GPUCanvasContext` in JS, but wgpu’s Rust `dyn_into` check still fails, so the app panics. This is a known browser + binding limitation, not your PDB file. **Workaround: open the same URL in Google Chrome or Chromium** (or another Chromium-based browser). See [gfx-rs/wgpu#8378](https://github.com/gfx-rs/wgpu/issues/8378).
+
 ### “unsupported MIME type '' expected application/wasm”
 
 Use **`npm run dev`** or **`npm run preview`**, not `file://` or a static server that omits WASM MIME types (e.g. plain `python -m http.server`). This project’s Vite config forces **`Content-Type: application/wasm`**, skips pre-bundling the viewer package, and sets **`Cross-Origin-Resource-Policy`** for COEP. After changing `vite.config.js`, restart the dev server and hard-refresh the page. If it still fails, clear Vite’s cache: **`rm -rf node_modules/.vite`** then **`npm run dev`** again.
