@@ -55,3 +55,7 @@ npm run preview
 - Vite sets **COOP** / **COEP** headers to match the viewer’s WASM expectations.
 - The build copies `pymol_web_bg.wasm` next to the bundled JS so `import.meta.url` resolves correctly.
 - If `npm install` fails on the `file:` path, fix the path or clone **pymol-rs** next to this repo and adjust `file:` accordingly.
+
+### “unsupported MIME type '' expected application/wasm”
+
+Use **`npm run dev`** or **`npm run preview`**, not `file://` or a static server that omits WASM MIME types (e.g. plain `python -m http.server`). This project’s Vite config forces **`Content-Type: application/wasm`**, skips pre-bundling the viewer package, and sets **`Cross-Origin-Resource-Policy`** for COEP. After changing `vite.config.js`, restart the dev server and hard-refresh the page. If it still fails, clear Vite’s cache: **`rm -rf node_modules/.vite`** then **`npm run dev`** again.
