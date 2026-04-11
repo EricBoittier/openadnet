@@ -1,6 +1,25 @@
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  realpathSync,
+} from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** `file:`-linked @pymol-rs/viewer lives outside this folder; Vite must be allowed to read dist/*.wasm. */
+function viewerPackageRealPaths() {
+  const linked = resolve(__dirname, "node_modules/@pymol-rs/viewer");
+  if (!existsSync(linked)) return [];
+  try {
+    return [realpathSync(linked)];
+  } catch {
+    return [linked];
+  }
+}
 
 /**
  * WebAssembly.instantiateStreaming() requires Content-Type: application/wasm.
@@ -64,6 +83,9 @@ export default defineConfig({
     exclude: ["@pymol-rs/viewer"],
   },
   server: {
+    fs: {
+      allow: [".", ...viewerPackageRealPaths()],
+    },
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",
