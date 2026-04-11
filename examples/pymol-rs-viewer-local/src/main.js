@@ -1,12 +1,5 @@
 import { PyMolRSViewer } from "@pymol-rs/viewer";
 
-function showWebGpuBanner(message) {
-  const el = document.getElementById("webgpu-warning");
-  if (!el) return;
-  el.textContent = message;
-  el.style.display = "block";
-}
-
 function guessFormat(fileName) {
   const lower = fileName.toLowerCase();
   const parts = lower.split(".").filter(Boolean);
@@ -33,12 +26,6 @@ function baseName(fileName) {
 }
 
 async function main() {
-  if (!("gpu" in navigator)) {
-    showWebGpuBanner(
-      "WebGPU is not available in this browser. Try an up-to-date Chromium-based browser, or enable WebGPU in Firefox Nightly (about:config).",
-    );
-  }
-
   const root = document.getElementById("viewer");
   if (!root) throw new Error("#viewer missing");
 
@@ -61,8 +48,19 @@ async function main() {
 
 main().catch((err) => {
   console.error(err);
+  const msg = String(err?.message ?? err);
+  const box = document.createElement("div");
   const t = document.createElement("p");
-  t.textContent = `Failed to start viewer: ${err?.message ?? err}`;
-  t.style.cssText = "padding:1rem;color:#c00;";
-  document.body.prepend(t);
+  t.style.cssText = "padding:1rem;color:#c00;max-width:42rem;line-height:1.4;margin:0;";
+  t.textContent = `Failed to start viewer: ${msg}`;
+  box.appendChild(t);
+  if (/webgpu|WebGPU|GPUAdapter|wgpu|navigator\.gpu/i.test(msg)) {
+    const sub = document.createElement("p");
+    sub.style.cssText =
+      "padding:0 1rem 1rem;color:#333;max-width:42rem;line-height:1.4;font-size:0.9rem;margin:0;";
+    sub.textContent =
+      "This app needs WebGPU. Try current Chrome or Edge, or Firefox with dom.webgpu.enabled (e.g. Nightly / beta). On Linux, use a GPU driver stack supported by your browser.";
+    box.appendChild(sub);
+  }
+  document.body.prepend(box);
 });
