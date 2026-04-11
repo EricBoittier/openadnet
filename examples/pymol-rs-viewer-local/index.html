@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyMOL-RS viewer — local file</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+      #app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      #toolbar {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      #viewer {
+        flex: 1;
+        min-height: 280px;
+      }
+      .hint {
+        opacity: 0.75;
+        font-size: 0.85rem;
+        max-width: 36rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="toolbar">
+        <label>
+          Open structure
+          <input
+            type="file"
+            id="file"
+            accept=".pdb,.cif,.mmcif,.bcif,.ent,.gz,application/octet-stream"
+          />
+        </label>
+        <p class="hint">
+          Uses <code>loadData()</code> after you pick a file. Requires a built
+          <code>@pymol-rs/viewer</code> (WASM + <code>dist/</code>) and a
+          browser with WebGPU.
+        </p>
+      </div>
+      <div id="viewer" aria-label="Molecule viewer"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
