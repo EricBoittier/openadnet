@@ -2201,6 +2201,26 @@
       "std_mae": 0.010042678352268316,
       "mean_r2": 0.4881246756243568,
       "std_r2": 0.015150343925426194
+    },
+    "fp_v2_cv_1|9e24f96a97e208314a42ebf2|rdkit_phys_props|lgbm|5|True|0|0|pEC50": {
+      "descriptor": "rdkit_phys_props",
+      "model": "lgbm",
+      "mean_rmse": 0.8027134884705225,
+      "std_rmse": 0.016246980101012946,
+      "mean_mae": 0.5906147594022245,
+      "std_mae": 0.008545769903971942,
+      "mean_r2": 0.4863058352113301,
+      "std_r2": 0.014833998829087635
+    },
+    "fp_v2_cv_1|9e24f96a97e208314a42ebf2|rdkit_phys_props|svr|5|True|0|0|pEC50": {
+      "descriptor": "rdkit_phys_props",
+      "model": "svr",
+      "mean_rmse": 0.7854059390872492,
+      "std_rmse": 0.03142228924203879,
+      "mean_mae": 0.5629315836485531,
+      "std_mae": 0.01886718571984997,
+      "mean_r2": 0.5083933483593498,
+      "std_r2": 0.02483840453193893
     }
   }
 }
