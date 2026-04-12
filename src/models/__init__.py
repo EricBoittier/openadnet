@@ -12,6 +12,7 @@ __all__ = [
     "FingerprintQuantileMember",
     "PhysGatedMorganQuantileMoE",
     "cross_validate_phys_gated_morgan_quantile_moe",
+    "kfold_ensemble_predict_phys_gated_morgan_moe",
     "HuggingFaceRegressor",
     "GNNRegressor",
     "PyGMoleculeRegressor",
@@ -44,6 +45,10 @@ def __getattr__(name: str) -> Any:
         from models.moe_quantile import cross_validate_phys_gated_morgan_quantile_moe
 
         return cross_validate_phys_gated_morgan_quantile_moe
+    if name == "kfold_ensemble_predict_phys_gated_morgan_moe":
+        from models.moe_quantile import kfold_ensemble_predict_phys_gated_morgan_moe
+
+        return kfold_ensemble_predict_phys_gated_morgan_moe
     if name == "pinball_loss":
         from models.ensemble import pinball_loss
 
@@ -74,6 +79,7 @@ if TYPE_CHECKING:
         FingerprintQuantileMember as FingerprintQuantileMember,
         PhysGatedMorganQuantileMoE as PhysGatedMorganQuantileMoE,
         cross_validate_phys_gated_morgan_quantile_moe as cross_validate_phys_gated_morgan_quantile_moe,
+        kfold_ensemble_predict_phys_gated_morgan_moe as kfold_ensemble_predict_phys_gated_morgan_moe,
     )
     from models.hf_regression import HuggingFaceRegressor as HuggingFaceRegressor
     from models.gnn_regression import GNNRegressor as GNNRegressor

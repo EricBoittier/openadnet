@@ -10,6 +10,7 @@ from models.moe_quantile import (
     FingerprintQuantileMember,
     PhysGatedMorganQuantileMoE,
     cross_validate_phys_gated_morgan_quantile_moe,
+    kfold_ensemble_predict_phys_gated_morgan_moe,
 )
 
 
@@ -112,6 +113,37 @@ def test_phys_gated_moe_gpr_and_ungated_experts():
     mix = moe.gated_mixing_weights(gate, X_m)
     assert mix.shape == (n, 2)
     assert np.allclose(mix.sum(axis=1), 1.0, atol=1e-5)
+
+
+def test_kfold_ensemble_predict_phys_gated_morgan_moe_smoke():
+    from baseline import BaselineCVConfig
+
+    rng = np.random.default_rng(7)
+    n_tr, n_te, d = 45, 11, 10
+    gate_tr = rng.standard_normal((n_tr, 3))
+    Xm_tr = rng.standard_normal((n_tr, d))
+    y_tr = gate_tr[:, 0] * 0.05 + Xm_tr[:, 0] + 0.1 * rng.standard_normal(n_tr)
+    gate_te = rng.standard_normal((n_te, 3))
+    Xm_te = rng.standard_normal((n_te, d))
+    cfg = BaselineCVConfig(n_splits=3, shuffle=True, cv_random_state=0, model_random_state=0)
+    pred = kfold_ensemble_predict_phys_gated_morgan_moe(
+        y_tr,
+        gate_tr,
+        Xm_tr,
+        gate_te,
+        Xm_te,
+        moe_params={
+            "n_components_gmm": 2,
+            "quantile_levels": (0.1, 0.5, 0.9),
+            "n_ensemble_members": 1,
+            "gmm_kwargs": {"covariance_type": "diag", "n_init": 1},
+            "hgb_kwargs": {"max_iter": 25, "max_depth": 2},
+        },
+        config=cfg,
+        show_progress=False,
+    )
+    assert pred.shape == (n_te,)
+    assert np.isfinite(pred).all()
 
 
 def test_cross_validate_phys_gated_morgan_moe_smoke():

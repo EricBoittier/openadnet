@@ -632,3 +632,94 @@ def cross_validate_phys_gated_morgan_quantile_moe(
         "quantile_levels": ql,
     }
     return summary, detail
+
+
+def kfold_ensemble_predict_phys_gated_morgan_moe(
+    y_train: np.ndarray,
+    X_gate_train: np.ndarray,
+    X_morgan_train: np.ndarray,
+    X_gate_test: np.ndarray,
+    X_morgan_test: np.ndarray,
+    *,
+    moe_params: dict[str, Any] | None = None,
+    config: Any | None = None,
+    show_progress: bool = True,
+) -> np.ndarray:
+    """Train one MoE per CV train fold; return the mean of median test predictions.
+
+    Uses the same ``KFold`` construction as :func:`cross_validate_phys_gated_morgan_quantile_moe`
+    and :class:`baseline.BaselineCVConfig`. Each fold fits on ``~ (1 - 1/K)`` of the
+    training rows, predicts **pEC50** (median quantile) for all test rows, then averages
+    across folds.
+
+    ``quantile_levels`` must include ``0.5`` (same as CV).
+
+    Parameters
+    ----------
+    y_train, X_gate_train, X_morgan_train
+        Filtered training arrays (same row order), e.g. after
+        :func:`baseline.prepare_training_data`.
+    X_gate_test, X_morgan_test
+        Test descriptors aligned to blind ``test`` table row order.
+    """
+    from baseline import BaselineCVConfig
+
+    from sklearn.model_selection import KFold
+    from tqdm.auto import tqdm
+
+    cfg = config or BaselineCVConfig()
+    params = dict(moe_params or {})
+    ql = tuple(float(q) for q in params.get("quantile_levels", (0.1, 0.5, 0.9)))
+    params["quantile_levels"] = ql
+    if _index_median(ql) is None:
+        raise ValueError(
+            "kfold_ensemble_predict_phys_gated_morgan_moe requires 0.5 in quantile_levels."
+        )
+
+    y_train = np.asarray(y_train, dtype=np.float64).ravel()
+    X_gate_train = np.asarray(X_gate_train, dtype=np.float64)
+    X_morgan_train = np.asarray(X_morgan_train, dtype=np.float64)
+    X_gate_test = np.asarray(X_gate_test, dtype=np.float64)
+    X_morgan_test = np.asarray(X_morgan_test, dtype=np.float64)
+    n_tr = y_train.shape[0]
+    n_te = X_gate_test.shape[0]
+    if X_gate_train.shape[0] != n_tr or X_morgan_train.shape[0] != n_tr:
+        raise ValueError("Train feature rows must match len(y_train)")
+    if X_gate_train.shape[1] != 3 or X_gate_test.shape[1] != 3:
+        raise ValueError("X_gate must have shape (n_samples, 3)")
+    if X_morgan_test.shape[0] != n_te:
+        raise ValueError("X_morgan_test rows must match X_gate_test rows")
+
+    base_rs = params.pop("random_state", cfg.model_random_state)
+    cv = KFold(
+        n_splits=cfg.n_splits,
+        shuffle=cfg.shuffle,
+        random_state=cfg.cv_random_state,
+    )
+    ds_te = _YOnlyCV(np.zeros(n_te, dtype=np.float64))
+    fold_preds: list[np.ndarray] = []
+    splits = list(cv.split(np.arange(n_tr)))
+    fold_iter = tqdm(
+        enumerate(splits),
+        total=len(splits),
+        desc="moe_kfold_test",
+        unit="fold",
+        disable=not show_progress,
+    )
+    for fold_id, (tr_idx, _) in fold_iter:
+        rs_fold = int(base_rs) + fold_id * 997
+        moe = PhysGatedMorganQuantileMoE(**{**params, "random_state": rs_fold})
+        ds_tr = _YOnlyCV(y_train[tr_idx])
+        moe.fit(
+            ds_tr,
+            X_gate=X_gate_train[tr_idx],
+            X_morgan=X_morgan_train[tr_idx],
+        )
+        p = moe.predict(
+            ds_te,
+            X_gate=X_gate_test,
+            X_morgan=X_morgan_test,
+        ).reshape(-1)
+        fold_preds.append(p)
+    stacked = np.stack(fold_preds, axis=0)
+    return np.asarray(np.mean(stacked, axis=0), dtype=np.float64)
