@@ -6,7 +6,11 @@ import numpy as np
 import pytest
 from sklearn.ensemble import HistGradientBoostingRegressor
 
-from models.moe_quantile import FingerprintQuantileMember, PhysGatedMorganQuantileMoE
+from models.moe_quantile import (
+    FingerprintQuantileMember,
+    PhysGatedMorganQuantileMoE,
+    cross_validate_phys_gated_morgan_quantile_moe,
+)
 
 
 class _DS:
@@ -108,6 +112,34 @@ def test_phys_gated_moe_gpr_and_ungated_experts():
     mix = moe.gated_mixing_weights(gate, X_m)
     assert mix.shape == (n, 2)
     assert np.allclose(mix.sum(axis=1), 1.0, atol=1e-5)
+
+
+def test_cross_validate_phys_gated_morgan_moe_smoke():
+    from baseline import BaselineCVConfig
+
+    rng = np.random.default_rng(6)
+    n = 60
+    gate = rng.standard_normal((n, 3))
+    X_m = rng.standard_normal((n, 12))
+    y = gate[:, 0] * 0.1 + X_m[:, 0] + 0.1 * rng.standard_normal(n)
+    cfg = BaselineCVConfig(n_splits=3, shuffle=True, cv_random_state=0, model_random_state=0)
+    summ, det = cross_validate_phys_gated_morgan_quantile_moe(
+        y,
+        gate,
+        X_m,
+        moe_params={
+            "n_components_gmm": 2,
+            "quantile_levels": (0.1, 0.5, 0.9),
+            "n_ensemble_members": 1,
+            "gmm_kwargs": {"covariance_type": "diag", "n_init": 1},
+            "hgb_kwargs": {"max_iter": 30, "max_depth": 2},
+        },
+        config=cfg,
+        show_progress=False,
+    )
+    assert summ.shape[0] == 1
+    assert len(det["rmse"]) == 3
+    assert 0.0 <= float(summ["mean_coverage"].iloc[0]) <= 1.0
 
 
 def test_phys_gated_moe_predict_requires_median_quantile():

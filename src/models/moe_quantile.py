@@ -482,3 +482,153 @@ class PhysGatedMorganQuantileMoE:
         for j, q in enumerate(self.quantile_levels):
             losses.append(pinball_loss(y_arr, pred[..., j], q))
         return float(np.mean(losses))
+
+
+class _YOnlyCV:
+    def __init__(self, y: np.ndarray) -> None:
+        yy = np.asarray(y, dtype=np.float64)
+        self.y = yy.reshape(-1, 1) if yy.ndim == 1 else yy
+
+    def __len__(self) -> int:
+        return int(self.y.shape[0])
+
+
+def cross_validate_phys_gated_morgan_quantile_moe(
+    y: np.ndarray,
+    X_gate: np.ndarray,
+    X_morgan: np.ndarray,
+    *,
+    moe_params: dict[str, Any] | None = None,
+    config: Any | None = None,
+    show_progress: bool = True,
+) -> tuple[Any, dict[str, Any]]:
+    """K-fold CV with the same ``KFold`` defaults as :class:`baseline.BaselineCVConfig`.
+
+    Trains :class:`PhysGatedMorganQuantileMoE` on each training fold and scores on
+    the held-out fold. Point metrics (RMSE, MAE, R²) use the **median** quantile
+    slice; ``quantile_levels`` must include ``0.5``.
+
+    Returns
+    -------
+    summary
+        One-row :class:`pandas.DataFrame` with mean/std across folds (columns
+        aligned with ``run_baseline_cv`` where applicable, plus pinball and
+        coverage for the outer quantile band).
+    detail
+        Dict with ``numpy`` arrays ``rmse``, ``mae``, ``r2``, ``pinball``,
+        ``coverage``, and ``nominal_coverage`` (scalar).
+    """
+    from baseline import BaselineCVConfig
+
+    import pandas as pd
+    from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
+    from sklearn.model_selection import KFold
+    from tqdm.auto import tqdm
+
+    cfg = config or BaselineCVConfig()
+    params = dict(moe_params or {})
+    ql = tuple(float(q) for q in params.get("quantile_levels", (0.1, 0.5, 0.9)))
+    params["quantile_levels"] = ql
+    i_med = _index_median(ql)
+    if i_med is None:
+        raise ValueError(
+            "cross_validate_phys_gated_morgan_quantile_moe requires 0.5 in quantile_levels "
+            "(median used for RMSE / MAE / R²)."
+        )
+    i_lo, i_hi = 0, len(ql) - 1
+    nominal_cov = float(ql[i_hi] - ql[i_lo])
+
+    y = np.asarray(y, dtype=np.float64).ravel()
+    X_gate = np.asarray(X_gate, dtype=np.float64)
+    X_morgan = np.asarray(X_morgan, dtype=np.float64)
+    n = y.shape[0]
+    if X_gate.shape[0] != n or X_morgan.shape[0] != n:
+        raise ValueError("y, X_gate, X_morgan must have the same number of rows")
+    if X_gate.shape[1] != 3:
+        raise ValueError("X_gate must have shape (n_samples, 3)")
+
+    base_rs = params.pop("random_state", cfg.model_random_state)
+    cv = KFold(
+        n_splits=cfg.n_splits,
+        shuffle=cfg.shuffle,
+        random_state=cfg.cv_random_state,
+    )
+
+    fold_rmse: list[float] = []
+    fold_mae: list[float] = []
+    fold_r2: list[float] = []
+    fold_pinball: list[float] = []
+    fold_cov: list[float] = []
+
+    splits = list(cv.split(np.arange(n)))
+    fold_iter = tqdm(
+        enumerate(splits),
+        total=len(splits),
+        desc="moe_cv",
+        unit="fold",
+        disable=not show_progress,
+    )
+    for fold_id, (tr_idx, va_idx) in fold_iter:
+        rs_fold = int(base_rs) + fold_id * 997
+        moe = PhysGatedMorganQuantileMoE(**{**params, "random_state": rs_fold})
+        ds_tr = _YOnlyCV(y[tr_idx])
+        ds_va = _YOnlyCV(y[va_idx])
+        moe.fit(
+            ds_tr,
+            X_gate=X_gate[tr_idx],
+            X_morgan=X_morgan[tr_idx],
+        )
+        q_va = moe.predict_quantiles(
+            ds_va,
+            X_gate=X_gate[va_idx],
+            X_morgan=X_morgan[va_idx],
+        )
+        y_va = y[va_idx]
+        q_med = q_va[:, 0, i_med]
+        fold_rmse.append(float(root_mean_squared_error(y_va, q_med)))
+        fold_mae.append(float(mean_absolute_error(y_va, q_med)))
+        fold_r2.append(float(r2_score(y_va, q_med)))
+
+        pinballs = [
+            pinball_loss(y_va.reshape(-1, 1), q_va[:, 0, j], ql[j]) for j in range(len(ql))
+        ]
+        fold_pinball.append(float(np.mean(pinballs)))
+
+        lo = q_va[:, 0, i_lo]
+        hi = q_va[:, 0, i_hi]
+        fold_cov.append(float(np.mean((y_va >= lo) & (y_va <= hi))))
+
+    rmse_a = np.asarray(fold_rmse, dtype=np.float64)
+    mae_a = np.asarray(fold_mae, dtype=np.float64)
+    r2_a = np.asarray(fold_r2, dtype=np.float64)
+    pb_a = np.asarray(fold_pinball, dtype=np.float64)
+    cov_a = np.asarray(fold_cov, dtype=np.float64)
+
+    row = {
+        "descriptor": "morgan+phys3_moe",
+        "model": "phys_gated_morgan_quantile_moe",
+        "mean_rmse": float(rmse_a.mean()),
+        "std_rmse": float(rmse_a.std()),
+        "mean_mae": float(mae_a.mean()),
+        "std_mae": float(mae_a.std()),
+        "mean_r2": float(r2_a.mean()),
+        "std_r2": float(r2_a.std()),
+        "mean_pinball": float(pb_a.mean()),
+        "std_pinball": float(pb_a.std()),
+        "mean_coverage": float(cov_a.mean()),
+        "std_coverage": float(cov_a.std()),
+        "nominal_coverage": nominal_cov,
+        "n_splits": int(cfg.n_splits),
+        "cv_random_state": cfg.cv_random_state,
+    }
+    summary = pd.DataFrame([row])
+    detail = {
+        "rmse": rmse_a,
+        "mae": mae_a,
+        "r2": r2_a,
+        "pinball": pb_a,
+        "coverage": cov_a,
+        "nominal_coverage": nominal_cov,
+        "quantile_levels": ql,
+    }
+    return summary, detail
