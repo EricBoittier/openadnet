@@ -9,6 +9,8 @@ __all__ = [
     "EnsembleQuantileRegressor",
     "EnsembleRegressor",
     "FingerprintEnsembleMember",
+    "FingerprintQuantileMember",
+    "PhysGatedMorganQuantileMoE",
     "HuggingFaceRegressor",
     "GNNRegressor",
     "PyGMoleculeRegressor",
@@ -29,6 +31,14 @@ def __getattr__(name: str) -> Any:
         from models.ensemble import FingerprintEnsembleMember
 
         return FingerprintEnsembleMember
+    if name == "FingerprintQuantileMember":
+        from models.moe_quantile import FingerprintQuantileMember
+
+        return FingerprintQuantileMember
+    if name == "PhysGatedMorganQuantileMoE":
+        from models.moe_quantile import PhysGatedMorganQuantileMoE
+
+        return PhysGatedMorganQuantileMoE
     if name == "pinball_loss":
         from models.ensemble import pinball_loss
 
@@ -54,6 +64,10 @@ if TYPE_CHECKING:
         EnsembleRegressor as EnsembleRegressor,
         FingerprintEnsembleMember as FingerprintEnsembleMember,
         pinball_loss as pinball_loss,
+    )
+    from models.moe_quantile import (
+        FingerprintQuantileMember as FingerprintQuantileMember,
+        PhysGatedMorganQuantileMoE as PhysGatedMorganQuantileMoE,
     )
     from models.hf_regression import HuggingFaceRegressor as HuggingFaceRegressor
     from models.gnn_regression import GNNRegressor as GNNRegressor
