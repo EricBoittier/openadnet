@@ -80,6 +80,36 @@ def test_phys_gated_moe_proba_and_quantile_shape():
     assert np.isfinite(pb)
 
 
+def test_phys_gated_moe_gpr_and_ungated_experts():
+    rng = np.random.default_rng(5)
+    n = 80
+    gate = rng.standard_normal((n, 3))
+    X_m = rng.standard_normal((n, 24))
+    y = gate[:, 0] * 0.2 + X_m[:, 0] + 0.1 * rng.standard_normal(n)
+    ds = _DS(y)
+    levels = [0.1, 0.5, 0.9]
+    moe = PhysGatedMorganQuantileMoE(
+        n_components_gmm=2,
+        quantile_levels=levels,
+        n_ensemble_members=1,
+        gmm_kwargs={"covariance_type": "diag", "n_init": 2},
+        hgb_kwargs={"max_iter": 40, "max_depth": 3},
+        pca_n_components_for_gpr=4,
+        gmm_gpr_blend=0.4,
+        n_ungated_experts=1,
+        ungated_mass=0.2,
+        gpr_max_train_samples=60,
+        gpr_alpha=0.1,
+        random_state=0,
+    )
+    moe.fit(ds, X_gate=gate, X_morgan=X_m)
+    q = moe.predict_quantiles(ds, X_gate=gate, X_morgan=X_m)
+    assert q.shape == (n, 1, 3)
+    mix = moe.gated_mixing_weights(gate, X_m)
+    assert mix.shape == (n, 2)
+    assert np.allclose(mix.sum(axis=1), 1.0, atol=1e-5)
+
+
 def test_phys_gated_moe_predict_requires_median_quantile():
     rng = np.random.default_rng(3)
     n = 50
